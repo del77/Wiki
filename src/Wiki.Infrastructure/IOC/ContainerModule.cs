@@ -19,6 +19,7 @@ namespace Wiki.Infrastructure.IOC
         {
             builder.RegisterInstance(AutoMapperConfig.Initialize()).SingleInstance();
             builder.RegisterModule<ServiceModule>();
+            builder.RegisterModule(new SettingsModule(configuration));
             builder.RegisterModule<RepositoryModule>();
         }
     }
