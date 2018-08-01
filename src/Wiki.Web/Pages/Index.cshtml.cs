@@ -15,6 +15,9 @@ namespace Wiki.Web.Pages
         //ICommandDispatcher commandDispatcher; dodac do konstruktora
         IUserService userService;
         public string User {get; set;}
+
+        [BindProperty]
+        public string Customer { get; set; }
         public IndexModel(IUserService userService)
         {
             //this.commandDispatcher = commandDispatcher;    
@@ -23,8 +26,8 @@ namespace Wiki.Web.Pages
         public async Task OnGet()
         {
             System.Console.WriteLine("abc");
-            var userdto = await userService.GetAsync("user1@email.com");
-            User = userdto.Email;
+            //var userdto = await userService.GetAsync("user1@email.com");
+            //User = userdto.Email;
         }
     }
 }

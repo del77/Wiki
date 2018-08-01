@@ -6,7 +6,7 @@ namespace Wiki.Core.Domain
     public class Agent
     {
         private ISet<Permission> permissions = new HashSet<Permission>();
-        public Guid UserId { get; protected set; }
+        public int UserId { get; protected set; }
         public IEnumerable<Permission> Permissions
         {
             get => permissions;

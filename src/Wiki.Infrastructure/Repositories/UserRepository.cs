@@ -7,12 +7,12 @@ using Wiki.Core.Repositories;
 
 namespace Wiki.Infrastructure.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository// : IUserRepository
     {
         private static readonly ISet<User> users = new HashSet<User>
         {
-            new User(Guid.NewGuid(), "user1@email.com", "secret", "salt"),
-            new User(Guid.NewGuid(), "user2@email.com", "secret", "salt")
+            new User(1, "user1@email.com", "secret", "salt"),
+            new User(2, "user2@email.com", "secret", "salt")
         };
 
         public async Task AddAsync(User user)
@@ -25,17 +25,18 @@ namespace Wiki.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<User> GetAsync(Guid id)
+        public async Task<User> GetAsync(int id)
         {
             return await Task.FromResult(users.SingleOrDefault(x => x.Id == id));
         }
 
         public async Task<User> GetAsync(string email)
         {
-            return await Task.FromResult(users.SingleOrDefault(x => x.Email == email));
+            //return await Task.FromResult(users.SingleOrDefault(x => x.Email == email));
+            return null;
         }
 
-        public async Task RemoveAsync(Guid id)
+        public async Task RemoveAsync(int id)
         {
             throw new NotImplementedException();
         }
