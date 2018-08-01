@@ -6,7 +6,6 @@ namespace Wiki.Core.Domain
     {
         private IDictionary<double, Text> texts = new Dictionary<double, Text>();
         private IList<Tag> tags = new List<Tag>();
-        private IList<string> suggestions = new List<string>();
 
 
         public Category category {get; protected set;}
@@ -19,4 +18,5 @@ namespace Wiki.Core.Domain
     }
 
     public enum Category { a, b, c }
+    public enum Tag { a, b, c}
 }
