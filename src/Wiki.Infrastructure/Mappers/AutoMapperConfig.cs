@@ -13,6 +13,7 @@ namespace Wiki.Infrastructure.Mappers
             {
                 cfg.CreateMap<User, UserDto>();
                 cfg.CreateMap<Agent, AgentDto>();
+                cfg.CreateMap<Article, ArticleDto>();
             })
             .CreateMapper();
         }

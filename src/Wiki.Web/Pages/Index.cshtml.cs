@@ -14,18 +14,21 @@ namespace Wiki.Web.Pages
     {
         //ICommandDispatcher commandDispatcher; dodac do konstruktora
         IUserService userService;
+        IArticleService articleService;
         public string User {get; set;}
 
         [BindProperty]
         public string Customer { get; set; }
-        public IndexModel(IUserService userService)
+        public IndexModel(IUserService userService, IArticleService articleService)
         {
             //this.commandDispatcher = commandDispatcher;    
             this.userService = userService;
+            this.articleService = articleService;
         }
         public async Task OnGet()
         {
             System.Console.WriteLine("abc");
+            var articledto = await articleService.GetAsync(1);
             //var userdto = await userService.GetAsync("user1@email.com");
             //User = userdto.Email;
         }

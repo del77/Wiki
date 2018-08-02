@@ -5,18 +5,28 @@ namespace Wiki.Core.Domain
     public class Article
     {
         private IDictionary<double, Text> texts = new Dictionary<double, Text>();
-        private IList<Tag> tags = new List<Tag>();
+        //private ISet<ArticleTag> tags = new HashSet<ArticleTag>();
+        private ISet<string> tags = new HashSet<string>();
 
 
-        public Category category {get; protected set;}
+        public int Id { get; protected set; }
+        public string Title {get; protected set; }
+        //public Category category {get; protected set;}
+        public string Category {get; protected set;}
         public IDictionary<double, Text> Texts { get { return texts; }}
-        public IEnumerable<Tag> Tags 
+        // public IEnumerable<ArticleTag> Tags 
+        // {
+        //     get { return tags; }
+        //     set { tags = new HashSet<ArticleTag>(value); }
+        // }
+
+        public IEnumerable<string> Tags 
         {
             get { return tags; }
-            set { tags = new List<Tag>(value); }
+            set { tags = new HashSet<string>(value); }
         }
     }
 
     public enum Category { a, b, c }
-    public enum Tag { a, b, c}
+
 }

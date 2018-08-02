@@ -5,13 +5,21 @@ namespace Wiki.Core.Domain
 {
     public class Agent
     {
-        private ISet<Permission> permissions = new HashSet<Permission>();
+        //private ISet<AgentPermission> permissions = new HashSet<AgentPermission>();
+        private ISet<string> permissions = new HashSet<string>();
         public int UserId { get; protected set; }
-        public IEnumerable<Permission> Permissions
+
+        public IEnumerable<string> Permissions
         {
             get => permissions;
-            set { permissions = new HashSet<Permission>(value); }
-        } 
+            set { permissions = new HashSet<string>(value); }
+        }
+
+        // public IEnumerable<AgentPermission> Permissions
+        // {
+        //     get => permissions;
+        //     set { permissions = new HashSet<AgentPermission>(value); }
+        // } 
 
         public Agent(User user)
         {
@@ -20,6 +28,6 @@ namespace Wiki.Core.Domain
         
     }
 
-    public enum Permission { Modify, Accept, Publish, Write, Read };
+    
 
 }

@@ -12,10 +12,10 @@ namespace Wiki.Infrastructure.Repositories
 {
     public class OracleUserRepository : IUserRepository
     {
-        private readonly IDbConnection oracleConnection;
+        private readonly SqlSettings settings;
         public OracleUserRepository(SqlSettings settings)
         {
-            this.oracleConnection = new OracleConnection(settings.ConnectionString);
+            this.settings = settings;
         }
         public Task AddAsync(User user)
         {
@@ -27,7 +27,7 @@ namespace Wiki.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<User> GetAsync(Guid id)
+        public async Task<User> GetAsync(int id)
         {
 
 
@@ -42,7 +42,7 @@ namespace Wiki.Infrastructure.Repositories
                 // Please replace the connection string attribute settings
                 
         
-                using(IDbConnection con = oracleConnection)
+                using(IDbConnection con = new OracleConnection(settings.ConnectionString))
                 {
                 con.Open();
                 //Console.WriteLine("Connected to Oracle Database {0}", con.ServerVersion);
@@ -65,7 +65,7 @@ namespace Wiki.Infrastructure.Repositories
             return null;
         }
 
-        public Task RemoveAsync(Guid id)
+        public Task RemoveAsync(int id)
         {
             throw new NotImplementedException();
         }
