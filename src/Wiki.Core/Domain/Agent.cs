@@ -21,6 +21,8 @@ namespace Wiki.Core.Domain
         //     set { permissions = new HashSet<AgentPermission>(value); }
         // } 
 
+        protected Agent() {}
+        
         public Agent(User user)
         {
             UserId = user.Id;

@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using Autofac;
+using Microsoft.AspNetCore.Http;
 using Wiki.Infrastructure.Services;
 
 namespace Wiki.Infrastructure.IOC.Modules
@@ -18,9 +19,14 @@ namespace Wiki.Infrastructure.IOC.Modules
                    .AsImplementedInterfaces()
                    .InstancePerLifetimeScope();
 
-            // builder.RegisterType<Encrypter>()
-            //        .As<IEncrypter>()
-            //        .SingleInstance();
+            builder.RegisterType<Encrypter>()
+                   .As<IEncrypter>()
+                   .SingleInstance();
+
+            builder.RegisterType<HttpContextAccessor>()
+                   .As<IHttpContextAccessor>()
+                   .SingleInstance();
+            
 
             // builder.RegisterType<JwtHandler>()
             //        .As<IJwtHandler>()
