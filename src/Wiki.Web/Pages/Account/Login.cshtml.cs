@@ -10,8 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Wiki.Infrastructure.Services;
 using Wiki.Web.Extensions;
+using Wiki.Web.ViewModels;
 
-namespace Wiki.Web.Pages
+namespace Wiki.Web.Pages.Account
 {
     public class LoginModel : PageModel
     {
@@ -25,7 +26,7 @@ namespace Wiki.Web.Pages
         }
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public User User_ { get; set; }
         public string ReturnUrl { get; set; }
 
         public void OnGet()
@@ -48,14 +49,14 @@ namespace Wiki.Web.Pages
 
                 try
                 {
-                    await userService.LoginAsync(Input.Email, Input.Password);
+                    await userService.LoginAsync(User_.Email, User_.Password);
                 }
                 catch(Exception e)
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return Page();
                 }
-                var user = await userService.GetAsync(Input.Email);
+                var user = await userService.GetAsync(User_.Email);
                 var agent = await agentService.GetAsync(user.Id);
 
                 #region snippet1
@@ -66,6 +67,10 @@ namespace Wiki.Web.Pages
                     new Claim(ClaimTypes.Role, "Administrator"),
                     new Claim(ClaimTypes.Role, "user123")
                 };
+                foreach (var permission in agent.Permissions)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, permission));
+                }
 
 
 

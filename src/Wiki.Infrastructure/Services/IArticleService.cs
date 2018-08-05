@@ -8,7 +8,7 @@ namespace Wiki.Infrastructure.Services
     public interface IArticleService : IService
     {
         Task<ArticleDto> GetAsync(int id);
-        Task<IEnumerable<ArticleDto>> BrowseTitlesAsync();
+        Task<IEnumerable<ArticleDto>> BrowseAsync(string title);
         
     }
 }

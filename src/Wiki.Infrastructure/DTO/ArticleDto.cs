@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 
 namespace Wiki.Infrastructure.DTO
 {
     public class ArticleDto
     {
         public int Id { get; set; }
-        public string Title {get; set; }
-        public string Category {get; set;}
+        
+        public string Category {get; set; }
+        public TextDto Master { get; set; }
+        public IDictionary<double, TextDto> Texts { get; set; }
     }
 }

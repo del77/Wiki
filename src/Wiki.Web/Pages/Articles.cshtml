@@ -1,0 +1,74 @@
+﻿@page
+@model ArticlesModel
+@{
+    ViewData["Title"] = "About";
+}
+<h2>@ViewData["Title"]</h2>
+
+<form asp-page="./Articles" method="get">
+
+    <div class="form-actions no-color">
+        <p>
+            Find by name:
+            <input type="text" name="title" value="@Model.Filter.Title" />
+            <label>Category</label>
+            <select asp-items="@Model.Filter.Categories" name="selectedCategory"></select>
+
+            <div>
+                <div>
+                    <table>
+                        <tr>
+                            @{
+                                foreach (var tag in Model.Filter.Tags)
+                                {
+
+                                    @:<td>
+                                        <input type="checkbox"
+                                               name="selectedTags"
+                                               value="@tag.Value"
+                                               @(Html.Raw(tag.Key ? "checked=\"checked\"" : "")) />
+                                        @tag.Value
+                                    @:</td>
+                                }
+                            @:</tr>
+                            }
+                        </table>
+                    </div>
+                </div>
+    </form>
+    <input type="submit" value="Search" class="btn btn-default" />
+    <a asp-page="./Articles">Back to full List</a>
+    </p>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Title
+                </th>
+                <th>
+                    Category
+                </th>
+                <th>
+                    Status
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Articles)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>

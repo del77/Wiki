@@ -17,7 +17,7 @@ namespace Wiki.Web.Pages
         //ICommandDispatcher commandDispatcher; dodac do konstruktora
         IUserService userService;
         IArticleService articleService;
-        public string User {get; set;}
+
 
         [BindProperty]
         public string Customer { get; set; }
@@ -31,7 +31,8 @@ namespace Wiki.Web.Pages
         {
             var xd = new HttpContextAccessor().HttpContext.User.Claims;
             System.Console.WriteLine("abc");
-            var articledto = await articleService.GetAsync(1);
+            
+            //var articledto = await articleService.GetAsync(1);
             //var userdto = await userService.GetAsync("user1@email.com");
             //User = userdto.Email;
         }

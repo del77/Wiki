@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Wiki.Infrastructure.Services;
 using Wiki.Web.Extensions;
+using Wiki.Web.ViewModels;
 
 namespace Wiki.Web.Pages.Account
 {
@@ -22,7 +23,7 @@ namespace Wiki.Web.Pages.Account
         }
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public User User_ { get; set; }
         public string ReturnUrl { get; set; }
 
         public void OnGet()
@@ -45,7 +46,7 @@ namespace Wiki.Web.Pages.Account
 
                 try
                 {
-                    await userService.RegisterAsync(Input.Email, Input.Password);
+                    await userService.RegisterAsync(User_.Email, User_.Password);
                 }
                 catch (Exception e)
                 {

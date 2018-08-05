@@ -53,35 +53,12 @@ namespace Wiki.Web
             services.AddMvc()
                 .AddRazorPagesOptions(options =>
                 {
-                    options.Conventions.AuthorizePage("/Contact");
+                    options.Conventions.AuthorizePage("/Articles/Add");
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            #region snippet1
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie();
-            #endregion
-
-            //
-
-            //services.AddAuthentication().AddJwtBearer(cfg =>
-            //{
-            //    cfg.TokenValidationParameters = new TokenValidationParameters
-            //    {
-            //        //ValidIssuer = "http://localhost:61161",
-            //        ValidateIssuer = false,
-            //        ValidateAudience = false,
-            //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("super_secret_key_123!"))
-            //    };
-            //});
-            //services.AddAuthentication(o =>
-            //{
-            //    o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            //});
-
-            //
-
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             var builder = new ContainerBuilder();

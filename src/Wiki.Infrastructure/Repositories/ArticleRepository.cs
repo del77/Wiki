@@ -25,9 +25,20 @@ namespace Wiki.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<string>> GetAllTitlesAsync()
+        public async Task<IEnumerable<Article>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
+            {
+                connection.Open();
+
+                //var xd = connection.Query<Article>("SELECT ID, Title, Category FROM Articles where Id = :id2", new { id2 = id });
+                //OracleDataReader reader = cmd.ExecuteReader();
+                //Console.WriteLine(reader.GetString(0));
+
+                //return xd.SingleOrDefault();
+                return null;
+                //Console.ReadLine();
+            }
         }
 
         public async Task<Article> GetAsync(int id)
