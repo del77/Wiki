@@ -9,8 +9,9 @@ namespace Wiki.Web.ViewModels
     public class Filter
     {
         public string Title { get; set; }
-        public IEnumerable<SelectListItem> Categories { get; set; }
+        public SelectList Categories { get; set; }
         public string SelectedCategory { get; set; }
-        public IEnumerable<KeyValuePair<bool, string>> Tags { get; set; }
+        public Dictionary<string, bool> Tags { get; set; }
+        public IEnumerable<string> Statuses { get; set; }
     }
 }

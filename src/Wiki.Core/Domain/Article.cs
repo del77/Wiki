@@ -4,7 +4,7 @@ namespace Wiki.Core.Domain
 {
     public class Article
     {
-        private IDictionary<double, Text> texts = new Dictionary<double, Text>();
+        private IList<Text> texts = new List<Text>();
         //private ISet<ArticleTag> tags = new HashSet<ArticleTag>();
         
 
@@ -13,8 +13,8 @@ namespace Wiki.Core.Domain
         public Text Master { get;  set; }
         //public Category category {get; protected set;}
         public string Category {get;  set;}
-        public IDictionary<double, Text> Texts { get { return texts; }
-            set { texts = value; }
+        public IEnumerable<Text> Texts { get { return texts; }
+            set { texts = new List<Text>(value); }
         }
         // public IEnumerable<ArticleTag> Tags 
         // {
@@ -24,7 +24,5 @@ namespace Wiki.Core.Domain
 
 
     }
-
-    public enum Category { a, b, c }
 
 }

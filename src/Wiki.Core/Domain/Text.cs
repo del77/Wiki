@@ -9,9 +9,11 @@ namespace Wiki.Core.Domain
         private IList<string> suggestions = new List<string>();
         private ISet<string> tags = new HashSet<string>();
 
+        public int Id { get; set; }
         public int ArticleId { get;  set; }
         public string Title { get;  set; }
         public int AuthorId { get;  set; }
+        public string Version { get; set; }
 
         public IEnumerable<string> Suggestions
         {

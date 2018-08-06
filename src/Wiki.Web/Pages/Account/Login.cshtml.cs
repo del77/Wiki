@@ -64,8 +64,6 @@ namespace Wiki.Web.Pages.Account
                 {
                     new Claim(ClaimTypes.Name, user.Email),
                     //new Claim("FullName", user.FullName),
-                    new Claim(ClaimTypes.Role, "Administrator"),
-                    new Claim(ClaimTypes.Role, "user123")
                 };
                 foreach (var permission in agent.Permissions)
                 {

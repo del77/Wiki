@@ -3,6 +3,7 @@ using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wiki.Core.Domain;
@@ -24,18 +25,17 @@ namespace Wiki.Infrastructure.Repositories
         {
             using (IDbConnection con = new OracleConnection(settings.ConnectionString))
             {
-                con.Open();
-                var response = await con.QuerySingleOrDefaultAsync<Agent>("SELECT * FROM Agents where userId = :ID", new { ID = id});
-                if (response != null)
+                var agent = await con.QuerySingleOrDefaultAsync<Agent>("SELECT * FROM Agents where userId = :ID", new { ID = id});
+                if (agent != null)
                 {
-                    var xd = con.Query("Select Permission From Agentspermissions where agentid = ID", new { ID = id });
+                    var permissions = con.Query<string>("Select PERMISSION From Agentspermissions");
+                    agent.Permissions = permissions;
                 }
                 //OracleDataReader reader = cmd.ExecuteReader();
-                //Console.WriteLine(reader.GetString(0));
 
                 Console.WriteLine("Press RETURN to exit.");
                 //Console.ReadLine();
-                return response;
+                return agent;
             }
         }
     }

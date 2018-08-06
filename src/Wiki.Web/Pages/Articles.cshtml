@@ -25,9 +25,9 @@
                                     @:<td>
                                         <input type="checkbox"
                                                name="selectedTags"
-                                               value="@tag.Value"
-                                               @(Html.Raw(tag.Key ? "checked=\"checked\"" : "")) />
-                                        @tag.Value
+                                               value="@tag.Key"
+                                               @(Html.Raw(tag.Value ? "checked=\"checked\"" : "")) />
+                                        @tag.Key
                                     @:</td>
                                 }
                             @:</tr>
@@ -63,7 +63,7 @@
                         @Html.DisplayFor(modelItem => item.Title)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Title)
+                        @Html.DisplayFor(modelItem => item.Category)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Status)
