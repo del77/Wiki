@@ -9,9 +9,11 @@ namespace Wiki.Core.Repositories
     {
         Task<Article> GetAsync(int id);
         Task<IEnumerable<Article>> GetAllAsync(IEnumerable<string> selectedTags, string title, string selectedCategory);
-        Task AddAsync(Article article);
+        Task AddAsync(Article article, Text text);
         Task UpdateAsync(Article article);
         Task RemoveAsync(int id);
-        Task<IEnumerable<IEnumerable<string>>> GetFilterInfo();
+        Task<IEnumerable<ArticleCategory>> GetCategories();
+        Task<IEnumerable<TextTag>> GetTags();
+        Task<IEnumerable<TextStatus>> GetStatuses();
     }
 }

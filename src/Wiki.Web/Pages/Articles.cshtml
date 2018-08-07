@@ -10,36 +10,33 @@
     <div class="form-actions no-color">
         <p>
             Find by name:
+        </p>
             <input type="text" name="title" value="@Model.Filter.Title" />
             <label>Category</label>
             <select asp-items="@Model.Filter.Categories" name="selectedCategory"></select>
 
-            <div>
-                <div>
-                    <table>
-                        <tr>
-                            @{
-                                foreach (var tag in Model.Filter.Tags)
-                                {
-
-                                    @:<td>
-                                        <input type="checkbox"
-                                               name="selectedTags"
-                                               value="@tag.Key"
-                                               @(Html.Raw(tag.Value ? "checked=\"checked\"" : "")) />
-                                        @tag.Key
-                                    @:</td>
-                                }
-                            @:</tr>
-                            }
-                        </table>
-                    </div>
-                </div>
-    </form>
-    <input type="submit" value="Search" class="btn btn-default" />
-    <a asp-page="./Articles">Back to full List</a>
-    </p>
+            <table>
+                <tr>
+                    @{
+                        foreach (var tag in Model.Filter.Tags)
+                        {
+                            @:<td>
+                                <input type="checkbox"
+                                        name="selectedTags"
+                                        value="@tag.Id"
+                                        @(Html.Raw(tag.Checked ? "checked=\"checked\"" : "")) />
+                                @tag.Tag
+                            @:</td>
+                        }
+                    @:</tr>
+                    }
+            </table>
+            
+        <input type="submit" value="Search" class="btn btn-default" />
     </div>
+</form>
+<a asp-page="./Articles">Back to full List</a>
+    
     <table class="table">
         <thead>
             <tr>

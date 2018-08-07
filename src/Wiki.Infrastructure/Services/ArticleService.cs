@@ -20,6 +20,9 @@ namespace Wiki.Infrastructure.Services
             this.mapper = mapper;
             this.articleRepository = articleRepository;
         }
+
+
+
         public async Task<IEnumerable<ArticleDto>> BrowseAsync(string title, IEnumerable<string> selectedTags, string selectedCategory)
         {
             var articles = await articleRepository.GetAllAsync(selectedTags, title, selectedCategory);
@@ -36,8 +39,7 @@ namespace Wiki.Infrastructure.Services
             //        //Texts = texts
             //    }
             //};
-            var xdd = mapper.Map<IEnumerable<ArticleDto>>(articles);
-            return xdd;
+            return mapper.Map<IEnumerable<ArticleDto>>(articles);
         }
 
 
@@ -47,9 +49,23 @@ namespace Wiki.Infrastructure.Services
             return mapper.Map<ArticleDto>(article);
         }
 
-        public async Task<IEnumerable<IEnumerable<string>>> GetFilterInfo()
+        public async Task<FilterInfo> GetFilterInfo()
         {
-            return await articleRepository.GetFilterInfo();
+            var categories = await articleRepository.GetCategories();
+            var tags = await articleRepository.GetTags();
+            var statuses = await articleRepository.GetStatuses();
+            var filter = new FilterInfo();
+            filter.Categories = mapper.Map<IEnumerable<ArticleCategoryDto>>(categories);
+            filter.Tags = mapper.Map<IEnumerable<TextTagDto>>(tags);
+            filter.Statuses = mapper.Map<IEnumerable<TextStatusDto>>(statuses);
+            return filter;
+        }
+
+        public async Task AddAsync(string title, string content, string[] selectedTags, string selectedCategory)
+        {
+            var article = new Article(content, selectedCategory);
+            var text = new Text(title, selectedTags);
+            await articleRepository.AddAsync(article, text);
         }
 
     }

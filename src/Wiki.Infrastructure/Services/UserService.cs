@@ -53,7 +53,7 @@ namespace Wiki.Infrastructure.Services
 
             var salt = encrypter.GetSalt();
             var hash = encrypter.GetHash(password, salt);
-            user = new User(1, email, hash, salt);
+            //user = new User(1, email, hash, salt);
             await userRepository.AddAsync(user);
         }
     }

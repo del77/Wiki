@@ -12,9 +12,9 @@ namespace Wiki.Core.Domain
         protected User()
         {}
 
-        public User(int id, string email, string password, string salt)
+        public User(string email, string password, string salt)
         {
-            Id = id;
+            //Id = id;
             Email = email;
             Password = password;
             Salt = salt;

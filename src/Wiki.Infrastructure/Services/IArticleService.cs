@@ -9,6 +9,7 @@ namespace Wiki.Infrastructure.Services
     {
         Task<ArticleDto> GetAsync(int id);
         Task<IEnumerable<ArticleDto>> BrowseAsync(string title, IEnumerable<string> selectedTags, string selectedCategory);
-        Task<IEnumerable<IEnumerable<string>>> GetFilterInfo();
+        Task<FilterInfo> GetFilterInfo();
+        Task AddAsync(string title, string content, string[] selectedTags, string selectedCategory);
     }
 }

@@ -7,8 +7,7 @@
 
 <html>
 <head>
-    <partial name="_FilterPartial"/>
-    <meta name="viewport" content="width=device-width"/>
+    <meta name="viewport" content="width=device-width" />
     <title>TinyMCE Example</title>
     <!-- TinyMCE Script Reference -->
     <script src="~/js/tinymce/tinymce.min.js"></script>
@@ -39,51 +38,37 @@
     </script>
 </head>
 <body>
-    @using (Html.BeginForm())
-    {
-        @Html.AntiForgeryToken()
+    <form asp-page="./Articles/Add" method="post">
 
         <div class="form-actions no-color">
-            <p>
-                Find by name:
-                <input type="text" name="title" value="@Model.Article.Filter.Title" />
-                <label>Category</label>
-                <select asp-items="@Model.Article.Filter.Categories" name="selectedCategory" asp-for="@Model.Article.Category"></select>
+            <label>Category</label>
+            <select asp-items="@Model.Filter.Categories" name="selectedCategory"></select>
 
-                    <div>
-                        <table>
-                            <tr>
-                                @{
-                                    foreach (var tag in Model.Article.Filter.Tags)
-                                    {
-
-                                        @:<td>
-                                            <input type="checkbox"
-                                                   name="selectedTags"
-                                                   value="@tag.Key"
-                                                   
-                                                   @(Html.Raw(tag.Value ? "checked=\"checked\"" : "")) />
-                                            @tag.Key
-                                        @:</td>
-                                    }
-                                @:</tr>
-                                }
-                            </table>
-                        </div>
-                </div>
-
-                    <!-- This will automatically post to your Index method (that is decorated with a HttpPost attribute) -->
-
-                    <div>
-                        Title: <input asp-for="Article.Title" />
-                        <!-- This will contain your HtmlContent and use the TinyMCE editor-->
-                        @Html.TextAreaFor(model => model.Article.Content)
-
-                        <input type="submit" value="Create" />
-                    </div>
+            <table>
+                <tr>
+                    @{
+                        foreach (var tag in Model.Filter.Tags)
+                        {
+                            @:<td>
+                                <input type="checkbox"
+                                       name="selectedTags"
+                                       value="@tag.Id"
+                                       @(Html.Raw(tag.Checked ? "checked=\"checked\"" : "")) />
+                                @tag.Tag
+                            @:</td>
+                        }
+                    @:</tr>
                     }
-        </body>
+                </table>
+                Title: <input asp-for="Article.Title" />
+                @Html.TextAreaFor(model => model.Article.Content)
+                <input type="submit" value="Search" class="btn btn-default" />
+            </div>
+        </form>
+</body>
 </html>
 
 
 <!-- /TinyMCE -->
+                      
+<!-- This will contain your HtmlContent and use the TinyMCE editor-->

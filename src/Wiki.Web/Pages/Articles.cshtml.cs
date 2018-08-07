@@ -39,8 +39,8 @@ namespace Wiki.Web.Pages
                     Articles.Add(new ViewModels.Article
                     {
                         Title = text.Title,
-                        Category = item.Category,
-                        Status = text.Status
+                        Category = item.Category.Category,
+                        Status = text.Status.Status
                     });
                 }
             }
@@ -49,21 +49,39 @@ namespace Wiki.Web.Pages
         private async void SetupFilter(string title, IEnumerable<string> selectedTags, string selectedCategory)
         {
             var filter = await articleService.GetFilterInfo();
+            var categories = new List<CategoryFilter>();
+            foreach (var category in filter.Categories)
+            {
+                categories.Add(new CategoryFilter
+                {
+                    Id = category.Id,
+                    Category = category.Category,
+                    Selected = false
+                });
+            }
+
             Filter = new Filter
             {
                 Title = title,
-                Categories = new SelectList(filter.ElementAt(0)),
-                Tags = new Dictionary<string, bool>(),
-                Statuses = filter.ElementAt(2)
+                Categories = new SelectList(categories, "Id", "Category"),
+                //Tags = filter.Tags,
+                //Statuses = filter.S
             };
-            foreach (var tag in filter.ElementAt(1))
+
+            Filter.Tags = new List<TagFilter>();
+            foreach (var tag in filter.Tags)
             {
-                Filter.Tags.Add(tag, false);
+                Filter.Tags.Add(new TagFilter
+                {
+                    Id = tag.Id,
+                    Tag = tag.Tag,
+                    Checked = false
+                });
             }
-            foreach (var tag in selectedTags)
-            {
-                Filter.Tags[tag] = true;
-            }
+            //foreach (var tag in selectedTags)
+            //{
+            //    Filter.Tags[tag] = true;
+            //}
             if (selectedCategory != null)
             {
                 Filter.Categories.Where(x => x.Text == selectedCategory).Single().Selected = true;

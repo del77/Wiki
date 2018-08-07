@@ -28,7 +28,7 @@ namespace Wiki.Infrastructure.Repositories
                 var agent = await con.QuerySingleOrDefaultAsync<Agent>("SELECT * FROM Agents where userId = :ID", new { ID = id});
                 if (agent != null)
                 {
-                    var permissions = con.Query<string>("Select PERMISSION From Agentspermissions");
+                    var permissions = con.Query<string>("Select PERMISSION From Agentspermissions a, permissions p where p.id = a.permissionid and a.agentid = :ID", new { ID = id });
                     agent.Permissions = permissions;
                 }
                 //OracleDataReader reader = cmd.ExecuteReader();

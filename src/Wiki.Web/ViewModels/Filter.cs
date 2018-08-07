@@ -11,7 +11,21 @@ namespace Wiki.Web.ViewModels
         public string Title { get; set; }
         public SelectList Categories { get; set; }
         public string SelectedCategory { get; set; }
-        public Dictionary<string, bool> Tags { get; set; }
+        public List<TagFilter> Tags { get; set; }
         public IEnumerable<string> Statuses { get; set; }
+    }
+
+    public class TagFilter
+    {
+        public int Id { get; set; }
+        public string Tag { get; set; }
+        public bool Checked { get; set; }
+    }
+
+    public class CategoryFilter
+    {
+        public int Id { get; set; }
+        public string Category { get; set; }
+        public bool Selected { get; set; }
     }
 }

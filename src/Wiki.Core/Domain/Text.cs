@@ -7,7 +7,17 @@ namespace Wiki.Core.Domain
     {
         // private IList<Suggestion> suggestions = new List<Suggestion>();
         private IList<string> suggestions = new List<string>();
-        private ISet<string> tags = new HashSet<string>();
+        private ISet<TextTag> tags = new HashSet<TextTag>();
+
+        public Text(string title, string[] selectedTags)
+        {
+            Title = title;
+        }
+
+        protected Text()
+        {
+
+        }
 
         public int Id { get; set; }
         public int ArticleId { get;  set; }
@@ -21,17 +31,16 @@ namespace Wiki.Core.Domain
             protected set { }
         }
 
-        public IEnumerable<string> Tags
+        public IEnumerable<TextTag> Tags
         {
             get { return tags; }
-            set { tags = new HashSet<string>(value); }
+            set { tags = new HashSet<TextTag>(value); }
         }
 
         public string Content { get;  set; }
 
         // public Status Status { get; protected set; }
-        public string Status { get;  set; }
+        public TextStatus Status { get;  set; }
     }
 
-    public enum Status { a, b, c }
 }

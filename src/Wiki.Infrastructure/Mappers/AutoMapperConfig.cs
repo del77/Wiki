@@ -15,6 +15,9 @@ namespace Wiki.Infrastructure.Mappers
                 cfg.CreateMap<Agent, AgentDto>();
                 cfg.CreateMap<Article, ArticleDto>();
                 cfg.CreateMap<Text, TextDto>();
+                cfg.CreateMap<TextTag, TextTagDto>();
+                cfg.CreateMap<TextStatus, TextStatusDto>();
+                cfg.CreateMap<ArticleCategory, ArticleCategoryDto>();
             })
             .CreateMapper();
         }

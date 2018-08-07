@@ -11,8 +11,8 @@ namespace Wiki.Infrastructure.Repositories
     {
         private static readonly ISet<User> users = new HashSet<User>
         {
-            new User(1, "user1@email.com", "secret", "salt"),
-            new User(2, "user2@email.com", "secret", "salt")
+            //new User(1, "user1@email.com", "secret", "salt"),
+            //new User(2, "user2@email.com", "secret", "salt")
         };
 
         public async Task AddAsync(User user)
