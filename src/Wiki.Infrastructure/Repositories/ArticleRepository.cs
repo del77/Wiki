@@ -41,11 +41,12 @@ namespace Wiki.Infrastructure.Repositories
             using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
             {
                 var articleQuery = "SELECT a.ID FROM Articles a";
-                var articles = await connection.QueryAsync<Article>(articleQuery, new { cat = "%" + selectedCategory + "%" });
+                var articles = await connection.QueryAsync<Article>(articleQuery);
+                //var articles = await connection.QueryAsync<Article>(articleQuery, new { cat = "%" + selectedCategory + "%" });
 
-                foreach(var article in articles)
+                foreach (var article in articles)
                 {
-                    var category = await connection.QueryAsync<ArticleCategory>("Select * From Categories where ID = :catid", new { catid = article. });
+                    var category = await connection.QueryAsync<ArticleCategory>("Select * From Categories where ID = (Select categoryid from articles where id = :artid)", new { artid = article.Id });
                     article.Category = category.Single();
 
                     var textsQuery = "Select t.Id, Title from Texts t, Statuses s where t.statusid = s.id and ArticleID = :artid and t.Title like :tit";
