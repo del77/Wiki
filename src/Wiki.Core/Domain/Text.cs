@@ -9,9 +9,11 @@ namespace Wiki.Core.Domain
         private IList<string> suggestions = new List<string>();
         private ISet<TextTag> tags = new HashSet<TextTag>();
 
-        public Text(string title, string[] selectedTags)
+        public Text(string title, string content, string version)
         {
             Title = title;
+            Content = content;
+            Version = version;
         }
 
         protected Text()
@@ -19,10 +21,25 @@ namespace Wiki.Core.Domain
 
         }
 
+        public void SetAuthor(User author)
+        {
+            Author = author;
+        }
+
+        public void SetTags(IEnumerable<TextTag> tags)
+        {
+            Tags = tags;
+        }
+
+        public void SetStatus(TextStatus status)
+        {
+            Status = status;
+        }
+
         public int Id { get; set; }
         public int ArticleId { get;  set; }
         public string Title { get;  set; }
-        public int AuthorId { get;  set; }
+        public User Author { get;  set; }
         public string Version { get; set; }
 
         public IEnumerable<string> Suggestions

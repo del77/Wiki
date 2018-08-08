@@ -22,12 +22,38 @@ namespace Wiki.Infrastructure.Repositories
             this.settings = settings;
         }
 
-        public async Task AddAsync(Article article, Text text)
+        public async Task AddAsync(Article article)
         {
             using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
             {
-                var param = new DynamicParameters();
-                //param.Add("")
+                //// art
+                var paramList = new DynamicParameters();
+                paramList.Add("CategoryID", article.Category.Id, direction: ParameterDirection.Input);
+                paramList.Add("Id", DbType.Int32, direction: ParameterDirection.Output);
+
+                connection.Execute("Insert into Articles (CategoryID) Values (:CategoryID) returning Id into :Id", paramList);
+                var articleId = paramList.Get<int>("Id");
+                //// art
+
+                //// text
+                paramList = new DynamicParameters();
+                paramList.Add("ArticleID", articleId, direction: ParameterDirection.Input);
+                paramList.Add("AuthorID", 3, direction: ParameterDirection.Input);
+                paramList.Add("StatusID", article.Master.Status.Id, direction: ParameterDirection.Input);
+                paramList.Add("Content", article.Master.Content, direction: ParameterDirection.Input);
+                paramList.Add("Title", article.Master.Title, direction: ParameterDirection.Input);
+                paramList.Add("Version", article.Master.Version, direction: ParameterDirection.Input);
+                paramList.Add("Id", DbType.Int32, direction: ParameterDirection.Output);
+                connection.Execute("Insert into Texts (articleid, authorid, statusid, content, title, version) Values (:ArticleID, :AuthorID, :StatusID, :Content, :Title, :Version) returning Id into :Id", paramList);
+                var textId = paramList.Get<int>("Id");
+                //// text
+
+                //// textstags
+                foreach (var tag in article.Master.Tags)
+                {
+                    await connection.QueryAsync("insert into textstags values (:textid, :tagid)", new { textid = textId, tagid = tag.Id });
+                }
+                //// textstags
             }
         }
 

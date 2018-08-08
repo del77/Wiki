@@ -61,11 +61,30 @@ namespace Wiki.Infrastructure.Services
             return filter;
         }
 
-        public async Task AddAsync(string title, string content, string[] selectedTags, string selectedCategory)
+        public async Task AddAsync(string title, string content, int[] selectedTags, int selectedCategory, int author=0)
         {
-            var article = new Article(content, selectedCategory);
-            var text = new Text(title, selectedTags);
-            await articleRepository.AddAsync(article, text);
+            var article = new Article();
+
+            var tags = new List<TextTag>();
+            foreach (var tag in selectedTags)
+            {
+                tags.Add(new TextTag(tag));
+            }
+
+            var user = new User(author);
+
+            var text = new Text(title, content, "1,0");
+            var status = new TextStatus(2);
+            text.SetStatus(status);
+            text.SetTags(tags);
+            text.SetAuthor(user);
+            article.SetText(text);
+
+            var category = new ArticleCategory(selectedCategory);
+            article.SetCategory(category);
+            
+
+            await articleRepository.AddAsync(article);
         }
 
     }

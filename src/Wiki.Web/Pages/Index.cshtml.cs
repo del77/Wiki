@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Wiki.Infrastructure.Commands;
@@ -29,9 +31,11 @@ namespace Wiki.Web.Pages
         }
         public async Task OnGet()
         {
-            var xd = new HttpContextAccessor().HttpContext.User.Claims;
-            System.Console.WriteLine("abc");
+            var xd = new HttpContextAccessor().HttpContext.User.Claims.Where(x => x.Type.Contains("role"));
             
+            System.Console.WriteLine("abc");
+
+            var ff = new HttpContextAccessor().HttpContext.User.Claims.Where(x => x.Type.Contains("role")).Where(y => y.Value == "Read").SingleOrDefault();
             //var articledto = await articleService.GetAsync(1);
             //var userdto = await userService.GetAsync("user1@email.com");
             //User = userdto.Email;

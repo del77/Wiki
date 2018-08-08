@@ -10,12 +10,20 @@ namespace Wiki.Core.Domain
         {
         }
 
-        protected Article()
+        public Article()
         {
 
         }
 
-        //private ISet<ArticleTag> tags = new HashSet<ArticleTag>();
+        public void SetCategory(ArticleCategory category)
+        {
+            Category = category;
+        }
+
+        public void SetText(Text text)
+        {
+            Master = text;
+        }
 
 
         public int Id { get;  set; }

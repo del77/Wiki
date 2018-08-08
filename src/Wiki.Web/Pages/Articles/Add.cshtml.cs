@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Oracle.ManagedDataAccess.Client;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Wiki.Infrastructure.DTO;
 using Wiki.Infrastructure.Services;
 using Wiki.Web.ViewModels;
 
@@ -13,6 +15,7 @@ namespace Wiki.Web.Pages.Articles
     public class AddModel : PageModel
     {
         private readonly IArticleService articleService;
+
 
         [BindProperty]
         public ViewModels.Article Article { get; set; }
@@ -30,12 +33,34 @@ namespace Wiki.Web.Pages.Articles
             await SetupFilter();
         }
 
-        public async Task<IActionResult> OnPostAsync(string[] selectedTags, string selectedCategory)
+        public async Task OnPostAsync(int[] selectedTags)
         {
-            //OracleCommand cmd = new OracleCommand()
-            await articleService.AddAsync(Article.Title, Article.Content, selectedTags, selectedCategory);
-            
-            return Page();
+            if (ModelState.IsValid)
+            {
+                //OracleCommand cmd = new OracleCommand()
+                var article = new ArticleDetailsDto();
+                //article.Category = new ArticleCategoryDto { Id = article.Category.Id };
+
+                //var tags = new List<TextTagDto>();
+                //foreach(var tag in selectedTags)
+                //{
+                //    tags.Add(new TextTagDto
+                //    {
+                //        Id = tag
+                //    });
+                //}
+
+                //article.Text = new TextDetailsDto
+                //{
+                //    //Author
+                //    Content = Article.Content,
+                //    Tags = tags,
+                //    Title = Article.Title
+                //};
+
+                await articleService.AddAsync(Article.Title, Article.Content, selectedTags, Article.Category.Id, 3);
+            }
+            await SetupFilter();
         }
 
         private async Task SetupFilter()

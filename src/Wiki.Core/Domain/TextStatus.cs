@@ -15,6 +15,11 @@ namespace Wiki.Core.Domain
             Status = status;
         }
 
+        public TextStatus(int id)
+        {
+            Id = id;
+        }
+
         protected TextStatus()
         {
 

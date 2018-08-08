@@ -36,12 +36,27 @@ namespace Wiki.Web.Pages
             {
                 foreach (var text in item.Texts)
                 {
-                    Articles.Add(new ViewModels.Article
+                    var article = new Article();
+                    article.Title = text.Title;
+                    article.Category = new CategoryFilter
                     {
-                        Title = text.Title,
-                        Category = item.Category.Category,
-                        Status = text.Status.Status
-                    });
+                        Id = item.Category.Id,
+                        Category = item.Category.Category
+                    };
+                    var tags = new List<TagFilter>();
+                    foreach(var tag in text.Tags)
+                    {
+                        tags.Add(new TagFilter
+                        {
+                            Id = tag.Id,
+                            Tag = tag.Tag,
+                            Checked = true
+                        });
+                    }
+                    article.Tags = tags;
+                    article.Status = text.Status.Status;
+
+                    Articles.Add(article);
                 }
             }
         }

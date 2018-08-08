@@ -20,6 +20,9 @@ namespace Wiki.Core.Domain
             Salt = salt;
             
         }
-        
+
+        public User(int author)
+        {
+        }
     }
 }

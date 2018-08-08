@@ -1,4 +1,5 @@
 ﻿@page
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 @model ArticlesModel
 @{
     ViewData["Title"] = "About";
@@ -11,32 +12,32 @@
         <p>
             Find by name:
         </p>
-            <input type="text" name="title" value="@Model.Filter.Title" />
-            <label>Category</label>
-            <select asp-items="@Model.Filter.Categories" name="selectedCategory"></select>
+        <input type="text" name="title" value="@Model.Filter.Title" />
+        <label>Category</label>
+        <select asp-items="@Model.Filter.Categories" name="selectedCategory"></select>
 
-            <table>
-                <tr>
-                    @{
-                        foreach (var tag in Model.Filter.Tags)
-                        {
-                            @:<td>
-                                <input type="checkbox"
-                                        name="selectedTags"
-                                        value="@tag.Id"
-                                        @(Html.Raw(tag.Checked ? "checked=\"checked\"" : "")) />
-                                @tag.Tag
-                            @:</td>
-                        }
-                    @:</tr>
+        <table>
+            <tr>
+                @{
+                    foreach (var tag in Model.Filter.Tags)
+                    {
+                        @:<td>
+                            <input type="checkbox"
+                                   name="selectedTags"
+                                   value="@tag.Id"
+                                   @(Html.Raw(tag.Checked ? "checked=\"checked\"" : "")) />
+                            @tag.Tag
+                        @:</td>
                     }
+                @:</tr>
+                }
             </table>
-            
-        <input type="submit" value="Search" class="btn btn-default" />
-    </div>
-</form>
-<a asp-page="./Articles">Back to full List</a>
-    
+
+            <input type="submit" value="Search" class="btn btn-default" />
+        </div>
+    </form>
+    <a asp-page="./Articles">Back to full List</a>
+
     <table class="table">
         <thead>
             <tr>
@@ -46,9 +47,12 @@
                 <th>
                     Category
                 </th>
+                @if (HttpContextAccessor.HttpContext.User.Claims.Where(x => x.Type.Contains("role")).Where(y => y.Value == "Read").SingleOrDefault() != null)
+                {
                 <th>
                     Status
                 </th>
+                }
                 <th></th>
             </tr>
         </thead>
@@ -60,10 +64,13 @@
                         @Html.DisplayFor(modelItem => item.Title)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Category)
+                        @Html.DisplayFor(modelItem => item.Category.Category)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Status)
+                        @if (HttpContextAccessor.HttpContext.User.Claims.Where(x => x.Type.Contains("role")).Where(y => y.Value == "Read").SingleOrDefault() != null)
+                        {
+                            @Html.DisplayFor(modelItem => item.Status)
+                        }
                     </td>
                 </tr>
             }
