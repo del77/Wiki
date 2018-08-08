@@ -23,7 +23,7 @@ namespace Wiki.Infrastructure.Services
 
 
 
-        public async Task<IEnumerable<ArticleDto>> BrowseAsync(string title, IEnumerable<string> selectedTags, string selectedCategory)
+        public async Task<IEnumerable<ArticleDto>> BrowseAsync(string title, IEnumerable<int> selectedTags, int selectedCategory)
         {
             var articles = await articleRepository.GetAllAsync(selectedTags, title, selectedCategory);
             //IDictionary<double, Text> texts = new Dictionary<double, Text>();

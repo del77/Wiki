@@ -26,7 +26,7 @@ namespace Wiki.Web.Pages
         }
 
 
-        public async Task OnGetAsync(string title, IEnumerable<string> selectedTags, string selectedCategory)
+        public async Task OnGetAsync(string title, IEnumerable<int> selectedTags, int selectedCategory)
         {
             SetupFilter(title, selectedTags, selectedCategory);
             
@@ -46,10 +46,16 @@ namespace Wiki.Web.Pages
             }
         }
 
-        private async void SetupFilter(string title, IEnumerable<string> selectedTags, string selectedCategory)
+        private async void SetupFilter(string title, IEnumerable<int> selectedTags, int selectedCategory)
         {
             var filter = await articleService.GetFilterInfo();
             var categories = new List<CategoryFilter>();
+            categories.Add(new CategoryFilter
+            {
+                Id = 0,
+                Category = "All",
+                Selected = true
+            });
             foreach (var category in filter.Categories)
             {
                 categories.Add(new CategoryFilter
@@ -64,8 +70,6 @@ namespace Wiki.Web.Pages
             {
                 Title = title,
                 Categories = new SelectList(categories, "Id", "Category"),
-                //Tags = filter.Tags,
-                //Statuses = filter.S
             };
 
             Filter.Tags = new List<TagFilter>();
@@ -78,13 +82,13 @@ namespace Wiki.Web.Pages
                     Checked = false
                 });
             }
-            //foreach (var tag in selectedTags)
-            //{
-            //    Filter.Tags[tag] = true;
-            //}
-            if (selectedCategory != null)
+            if (selectedCategory != 0)
             {
-                Filter.Categories.Where(x => x.Text == selectedCategory).Single().Selected = true;
+                Filter.Categories.Where(x => x.Value == selectedCategory.ToString()).Single().Selected = true;
+            }
+            foreach(var tag in selectedTags)
+            {
+                Filter.Tags.Where(x => x.Id == tag).Single().Checked = true;
             }
         }
     }

@@ -42,7 +42,7 @@
 
         <div class="form-actions no-color">
             <label>Category</label>
-            <select asp-items="@Model.Filter.Categories" name="selectedCategory"></select>
+            <select asp-items="@Model.Filter.Categories" asp-for="Article.Category"></select>
 
             <table>
                 <tr>
@@ -53,6 +53,7 @@
                                 <input type="checkbox"
                                        name="selectedTags"
                                        value="@tag.Id"
+                                       asp-for="Article.Tags"
                                        @(Html.Raw(tag.Checked ? "checked=\"checked\"" : "")) />
                                 @tag.Tag
                             @:</td>

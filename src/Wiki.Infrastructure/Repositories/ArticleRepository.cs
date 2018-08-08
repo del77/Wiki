@@ -31,16 +31,17 @@ namespace Wiki.Infrastructure.Repositories
             }
         }
 
-        public async Task<IEnumerable<Article>> GetAllAsync(IEnumerable<string> selectedTags, string title, string selectedCategory)
+        public async Task<IEnumerable<Article>> GetAllAsync(IEnumerable<int> selectedTags, string title, int selectedCategory)
         {
             if (title == null)
                 title = "";
-            if (selectedCategory == null)
-                selectedCategory = "";
+
+            var articleQuery = "SELECT a.ID FROM Articles a";
+            if (selectedCategory != 0)
+                articleQuery += $" where categoryid={selectedCategory}";
 
             using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
             {
-                var articleQuery = "SELECT a.ID FROM Articles a";
                 var articles = await connection.QueryAsync<Article>(articleQuery);
                 //var articles = await connection.QueryAsync<Article>(articleQuery, new { cat = "%" + selectedCategory + "%" });
 
@@ -49,12 +50,29 @@ namespace Wiki.Infrastructure.Repositories
                     var category = await connection.QueryAsync<ArticleCategory>("Select * From Categories where ID = (Select categoryid from articles where id = :artid)", new { artid = article.Id });
                     article.Category = category.Single();
 
-                    var textsQuery = "Select t.Id, Title from Texts t, Statuses s where t.statusid = s.id and ArticleID = :artid and t.Title like :tit";
+
+                    var textsQuery = $"Select Id, Title from Texts where ArticleID = :artid and Title like :tit";
+                    var tagsCount = selectedTags.Count();
+                    if (tagsCount > 0)
+                    {
+                        StringBuilder tagsString = new StringBuilder();
+                        for (int i = 0; i < tagsCount; i++)
+                        {
+                            tagsString.Append(selectedTags.ElementAt(i));
+                            if (i != tagsCount - 1)
+                                tagsString.Append(", ");
+                        }
+                        textsQuery += $" and Id in (Select textid from textstags where tagid in ({tagsString}) group by textid having count(tagid) = {tagsCount})";
+                    }
+                    //var textsQuery = "Select t.Id, Title from Texts t, Statuses s where t.statusid = s.id and ArticleID = :artid and t.Title like :tit";
+                    
                     var texts = connection.Query<Text>(textsQuery, new { artid = article.Id, tit = "%" + title + "%" });
+
+                    var tagsQuery = "Select * from textstags tt, tags t where t.ID = tt.TAGID and textid = :txid";
                     foreach (var text in texts)
                     {
-                        var status = (await connection.QueryAsync<TextStatus>("Select * from Statuses s where id = :txid", new { txid = text.Id })).Single();
-                        var tags = await connection.QueryAsync<TextTag>("Select t.id, tag from textstags tt, tags t where t.ID = tt.TAGID and textid = :txid", new { txid = text.Id });
+                        var status = (await connection.QueryAsync<TextStatus>($"Select * from Statuses s where id = (Select statusid from texts where id={text.Id})")).Single();
+                        var tags = await connection.QueryAsync<TextTag>(tagsQuery, new { txid = text.Id });
                         text.Tags = tags;
                         text.Status = status;
                     }

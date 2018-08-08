@@ -41,17 +41,48 @@ namespace Wiki.Web.Pages.Articles
         private async Task SetupFilter()
         {
             var filter = await articleService.GetFilterInfo();
-            //Filter = new Filter
+            var categories = new List<CategoryFilter>();
+            //categories.Add(new CategoryFilter
             //{
-                
-            //    Categories = new SelectList(filter.ElementAt(0)),
-            //    //Tags = new Dictionary<string, bool>(),
-            //    Statuses = filter.ElementAt(2)
-            //};
-            //foreach (var tag in filter.ElementAt(1))
+            //    Id = 0,
+            //    Category = "All",
+            //    Selected = true
+            //}); todo select cateogry
+            foreach (var category in filter.Categories)
+            {
+                categories.Add(new CategoryFilter
+                {
+                    Id = category.Id,
+                    Category = category.Category,
+                    Selected = false
+                });
+            }
+
+            Filter = new Filter
+            {
+                //Title = title,
+                Categories = new SelectList(categories, "Id", "Category"),
+            };
+
+            Filter.Tags = new List<TagFilter>();
+            foreach (var tag in filter.Tags)
+            {
+                Filter.Tags.Add(new TagFilter
+                {
+                    Id = tag.Id,
+                    Tag = tag.Tag,
+                    Checked = false
+                });
+            }
+            //if (selectedCategory != 0)
             //{
-            //    Filter.Tags.Add(tag, false);
+            //    Filter.Categories.Where(x => x.Value == selectedCategory.ToString()).Single().Selected = true;
             //}
+            //foreach (var tag in selectedTags)
+            //{
+            //    Filter.Tags.Where(x => x.Id == tag).Single().Checked = true;
+            //}
+            
 
         }
     }
