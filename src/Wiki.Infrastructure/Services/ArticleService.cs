@@ -23,30 +23,17 @@ namespace Wiki.Infrastructure.Services
 
 
 
-        public async Task<IEnumerable<ArticleDto>> BrowseAsync(string title, IEnumerable<int> selectedTags, int selectedCategory)
+        public async Task<IEnumerable<ArticleDto>> BrowseAsync(string title, IEnumerable<int> selectedTags, int selectedCategory, int selectedStatus)
         {
-            var articles = await articleRepository.GetAllAsync(selectedTags, title, selectedCategory);
-            //IDictionary<double, Text> texts = new Dictionary<double, Text>();
-            //texts.Add(1.0, new Text { ArticleId = 1, Status = "Done", Tags = new []{"tag1"}, Title = "tytul"});
-            //texts.Add(2.0, new Text { ArticleId = 1, Status = "Done", Tags = new[] { "tag2" }, Title = "tytul2" });
-            //var xd = new List<Article>
-            //{
-            //    new Article()
-            //    {
-            //        Id = 1,
-            //        Category = "Mainc",
-            //        Master = (Text) texts[1.0],
-            //        //Texts = texts
-            //    }
-            //};
+            var articles = await articleRepository.GetAllAsync(selectedTags, title, selectedCategory, selectedStatus);
             return mapper.Map<IEnumerable<ArticleDto>>(articles);
         }
 
 
-        public async Task<ArticleDto> GetAsync(int id)
+        public async Task<ArticleDetailsDto> GetAsync(int articleid, int textid)
         {
-            var article = await articleRepository.GetAsync(id);
-            return mapper.Map<ArticleDto>(article);
+            var article = await articleRepository.GetAsync(articleid, textid);
+            return mapper.Map<ArticleDetailsDto>(article);
         }
 
         public async Task<FilterInfo> GetFilterInfo()
@@ -73,7 +60,7 @@ namespace Wiki.Infrastructure.Services
 
             var user = new User(author);
 
-            var text = new Text(title, content, "1,0");
+            var text = new Text(title, content, "1.0");
             var status = new TextStatus(2);
             text.SetStatus(status);
             text.SetTags(tags);

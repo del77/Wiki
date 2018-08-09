@@ -62,12 +62,15 @@
                     }
                 </table>
 
-                    Title: <input asp-for="Article.Title" />
-                    <span asp-validation-for="@Model.Article.Title" class="text-danger"/>
+                Title: <input asp-for="Article.Title" />
+                <span asp-validation-for="@Model.Article.Title" class="text-danger" />
 
-                    @Html.TextAreaFor(model => model.Article.Content)
-                    <input type="submit" value="Search" class="btn btn-default" />
-                </div>
+                @Html.TextAreaFor(model => model.Article.Content)
+                <button type="submit" onclick="SaveTags">abc</button>
+                <input type="submit" value="Search" runat="server" class="btn btn-default" />
+                
+            
+            </div>
 </form>
 </body>
 </html>

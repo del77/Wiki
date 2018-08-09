@@ -6,13 +6,14 @@ namespace Wiki.Core.Domain
     {
         private IList<Text> texts = new List<Text>();
 
-        public Article(string content, string selectedCategory)
+
+        public Article(int id)
         {
+            Id = id;
         }
 
         public Article()
         {
-
         }
 
         public void SetCategory(ArticleCategory category)
@@ -33,6 +34,11 @@ namespace Wiki.Core.Domain
         public ArticleCategory Category {get;  set;}
         public IEnumerable<Text> Texts { get { return texts; }
             set { texts = new List<Text>(value); }
+        }
+
+        public void SetMaster(Text text)
+        {
+            Master = text;
         }
         // public IEnumerable<ArticleTag> Tags 
         // {

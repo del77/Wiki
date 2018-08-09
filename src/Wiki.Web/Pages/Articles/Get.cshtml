@@ -1,0 +1,35 @@
+﻿@page
+@using Wiki.Web.Extensions
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+@model Wiki.Web.Pages.Articles.GetModel
+@{
+    ViewData["Title"] = "Get";
+}
+
+<style>
+    .article {
+        background-color: lightgray;
+        color: black;
+        padding: 10px;
+        border: 10px
+    }
+</style>
+<div class="row">
+    <div class="col-md-10">
+        <h2>@Model.Article.Title</h2>
+        <p>Author: @Model.Article.Author.Email</p>
+        <p>Tags: @Model.Article.Tags.Select(x => x.Tag).AsString()</p>
+        <p>Category: @Model.Article.Category.Category</p>
+        @if (HttpContextAccessor.HttpContext.User.IsInRole("Read"))
+        {
+            <p>Status: @Model.Article.Status.Status</p>
+        }
+        @Html.Raw("<div class=\"article\">" + Model.Article.Content + "</div>")
+        </div>
+    @if(Model.HttpContext.User.Identity.IsAuthenticated)
+    {
+        <div class="col-md-1 col-md-offset-12 table-bordered">
+            <a asp-page="/Articles/Add" asp-route-articleid="@Model.Article.ArticleId" asp-route-textid="@Model.Article.TextId">Edit</a>
+        </div>
+    }
+    </div>

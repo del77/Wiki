@@ -28,9 +28,9 @@ namespace Wiki.Infrastructure.IOC.Modules
                    .SingleInstance();
             
 
-            // builder.RegisterType<JwtHandler>()
-            //        .As<IJwtHandler>()
-            //        .SingleInstance();
+            builder.RegisterType<HttpContextAccessor>()
+                   .As<IHttpContextAccessor>()
+                   .SingleInstance();
         }
     }
 }

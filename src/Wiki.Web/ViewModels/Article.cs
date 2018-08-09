@@ -8,12 +8,15 @@ namespace Wiki.Web.ViewModels
 {
     public class Article
     {
+        public int ArticleId { get; set; }
+        public int TextId { get; set; }
         [Required]
         public string Title { get; set; }
-        [Required, StringLength(100)]
+        [Required]
         public string Content { get; set; }
+        public Author Author { get; set; }
         public CategoryFilter Category { get; set; }
         public List<TagFilter> Tags { get; set; }
-        public string Status { get; set; }
+        public StatusFilter Status { get; set; }
     }
 }

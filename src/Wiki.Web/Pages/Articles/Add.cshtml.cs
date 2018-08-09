@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Oracle.ManagedDataAccess.Client;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,22 +17,64 @@ namespace Wiki.Web.Pages.Articles
     public class AddModel : PageModel
     {
         private readonly IArticleService articleService;
-
+        private readonly IHttpContextAccessor httpContextAccessor;
 
         [BindProperty]
         public ViewModels.Article Article { get; set; }
         [BindProperty]
         public Filter Filter { get; set;
         }
-        public AddModel(IArticleService articleService)
+        public AddModel(IArticleService articleService, IHttpContextAccessor httpContextAccessor)
         {
             Article = new Article();
             this.articleService = articleService;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task OnGet()
+        public async Task<IActionResult> OnGet(int articleid, int textid)
         {
             await SetupFilter();
+            if (textid != 0)
+            {
+                var article = await articleService.GetAsync(articleid, textid);
+                if (!httpContextAccessor.HttpContext.User.IsInRole("Read") && article.Master.Status.Id != 1)
+                    return Page();
+                Article = new ViewModels.Article
+                {
+                    ArticleId = article.Id,
+                    TextId = article.Master.Id,
+                    Category = new ViewModels.CategoryFilter
+                    {
+                        Id = article.Category.Id,
+                        Category = article.Category.Category
+                    },
+                    Content = article.Master.Content,
+                    Status = new ViewModels.StatusFilter
+                    {
+                        Id = article.Master.Status.Id,
+                        Status = article.Master.Status.Status
+                    },
+                    Title = article.Master.Title,
+                    Author = new Author
+                    {
+                        Id = article.Master.Author.Id,
+                        Email = article.Master.Author.Email
+                    }
+                };
+                var tags = new List<TagFilter>();
+                foreach (var tag in article.Master.Tags)
+                {
+                    tags.Add(new TagFilter
+                    {
+                        Id = tag.Id,
+                        Tag = tag.Tag
+                    });
+                }
+                Article.Tags = tags;
+                Article.Content = article.Master.Content;
+                Article.Title = article.Master.Title;
+            }
+            return Page();
         }
 
         public async Task OnPostAsync(int[] selectedTags)
@@ -60,6 +104,7 @@ namespace Wiki.Web.Pages.Articles
 
                 await articleService.AddAsync(Article.Title, Article.Content, selectedTags, Article.Category.Id, 3);
             }
+            
             await SetupFilter();
         }
 
@@ -99,6 +144,7 @@ namespace Wiki.Web.Pages.Articles
                     Checked = false
                 });
             }
+
             //if (selectedCategory != 0)
             //{
             //    Filter.Categories.Where(x => x.Value == selectedCategory.ToString()).Single().Selected = true;
@@ -109,6 +155,11 @@ namespace Wiki.Web.Pages.Articles
             //}
             
 
+
+        }
+        protected void SaveTags(object sender, EventArgs e)
+        {
+            Article.Tags = new List<TagFilter>(Filter.Tags.Where(x => x.Checked == true));
         }
     }
 }

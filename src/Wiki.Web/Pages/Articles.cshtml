@@ -1,6 +1,7 @@
 ﻿@page
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 @model ArticlesModel
+
 @{
     ViewData["Title"] = "About";
 }
@@ -15,7 +16,11 @@
         <input type="text" name="title" value="@Model.Filter.Title" />
         <label>Category</label>
         <select asp-items="@Model.Filter.Categories" name="selectedCategory"></select>
-
+        @if (Model.CanRead)
+        {
+            <label>Status</label>
+            <select asp-items="@Model.Filter.Statuses" name="selectedStatus"></select>
+        }
         <table>
             <tr>
                 @{
@@ -47,11 +52,11 @@
                 <th>
                     Category
                 </th>
-                @if (HttpContextAccessor.HttpContext.User.Claims.Where(x => x.Type.Contains("role")).Where(y => y.Value == "Read").SingleOrDefault() != null)
+                @if (Model.CanRead)
                 {
-                <th>
-                    Status
-                </th>
+                    <th>
+                        Status
+                    </th>
                 }
                 <th></th>
             </tr>
@@ -61,15 +66,15 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Title)
+                        <a asp-page="/Articles/Get" asp-route-articleid="@item.ArticleId" asp-route-textid="@item.TextId">@Html.DisplayFor(modelItem => item.Title)</a>
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Category.Category)
                     </td>
                     <td>
-                        @if (HttpContextAccessor.HttpContext.User.Claims.Where(x => x.Type.Contains("role")).Where(y => y.Value == "Read").SingleOrDefault() != null)
+                        @if (Model.CanRead)
                         {
-                            @Html.DisplayFor(modelItem => item.Status)
+                            @Html.DisplayFor(modelItem => item.Status.Status)
                         }
                     </td>
                 </tr>

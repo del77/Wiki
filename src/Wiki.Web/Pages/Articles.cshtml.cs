@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,24 +14,33 @@ namespace Wiki.Web.Pages
     public class ArticlesModel : PageModel
     {
         private readonly IArticleService articleService;
-        
+        private readonly IHttpContextAccessor httpContextAccessor;
+
         [BindProperty]
         public List<ViewModels.Article> Articles { get; set; }
         [BindProperty]
         public Filter Filter { get; set; }
+        public bool CanRead { get; set; }
 
-        public ArticlesModel(IArticleService articleService)
+        public ArticlesModel(IArticleService articleService, IHttpContextAccessor httpContextAccessor)
         {
             //this.commandDispatcher = commandDispatcher;    
             this.articleService = articleService;
+            this.httpContextAccessor = httpContextAccessor;
+            CanRead = httpContextAccessor.HttpContext.User.IsInRole("Read");
         }
 
 
-        public async Task OnGetAsync(string title, IEnumerable<int> selectedTags, int selectedCategory)
+        public async Task<IActionResult> OnGetAsync(string title, IEnumerable<int> selectedTags, int selectedCategory, int selectedStatus)
         {
             SetupFilter(title, selectedTags, selectedCategory);
-            
-            var res = await articleService.BrowseAsync(title, selectedTags, selectedCategory);
+            if(!CanRead && selectedStatus != 0)
+            {
+                return Page();
+            }
+            if (!CanRead)
+                selectedStatus = 1;
+            var res = await articleService.BrowseAsync(title, selectedTags, selectedCategory, selectedStatus);
             Articles = new List<ViewModels.Article>();
             foreach (var item in res)
             {
@@ -53,12 +63,21 @@ namespace Wiki.Web.Pages
                             Checked = true
                         });
                     }
+                    article.ArticleId = item.Id;
+                    article.TextId = text.Id;
                     article.Tags = tags;
-                    article.Status = text.Status.Status;
+                    article.Status = new StatusFilter
+                    {
+                        Id = text.Status.Id,
+                        Status = text.Status.Status,
+                        Selected = false
+                    };
+                        
 
                     Articles.Add(article);
                 }
             }
+            return Page();
         }
 
         private async void SetupFilter(string title, IEnumerable<int> selectedTags, int selectedCategory)
@@ -81,10 +100,28 @@ namespace Wiki.Web.Pages
                 });
             }
 
+            var statuses = new List<StatusFilter>();
+            statuses.Add(new StatusFilter
+            {
+                Id = 0,
+                Status = "All",
+                Selected = true
+            });
+            foreach(var status in filter.Statuses)
+            {
+                statuses.Add(new StatusFilter
+                {
+                    Id = status.Id,
+                    Status = status.Status,
+                    Selected = false
+                });
+            }
+
             Filter = new Filter
             {
                 Title = title,
                 Categories = new SelectList(categories, "Id", "Category"),
+                Statuses = new SelectList(statuses, "Id", "Status")
             };
 
             Filter.Tags = new List<TagFilter>();

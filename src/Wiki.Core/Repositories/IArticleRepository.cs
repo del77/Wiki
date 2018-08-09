@@ -7,8 +7,8 @@ namespace Wiki.Core.Repositories
 {
     public interface IArticleRepository : IRepository
     {
-        Task<Article> GetAsync(int id);
-        Task<IEnumerable<Article>> GetAllAsync(IEnumerable<int> selectedTags, string title, int selectedCategory);
+        Task<Article> GetAsync(int articleid, int textid);
+        Task<IEnumerable<Article>> GetAllAsync(IEnumerable<int> selectedTags, string title, int selectedCategory, int selectedStatus);
         Task AddAsync(Article article);
         Task UpdateAsync(Article article);
         Task RemoveAsync(int id);

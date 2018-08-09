@@ -57,7 +57,7 @@ namespace Wiki.Infrastructure.Repositories
             }
         }
 
-        public async Task<IEnumerable<Article>> GetAllAsync(IEnumerable<int> selectedTags, string title, int selectedCategory)
+        public async Task<IEnumerable<Article>> GetAllAsync(IEnumerable<int> selectedTags, string title, int selectedCategory, int selectedStatus)
         {
             if (title == null)
                 title = "";
@@ -78,6 +78,9 @@ namespace Wiki.Infrastructure.Repositories
 
 
                     var textsQuery = $"Select Id, Title from Texts where ArticleID = :artid and Title like :tit";
+                    if (selectedStatus != 0)
+                        textsQuery += $" and statusid={selectedStatus}";
+
                     var tagsCount = selectedTags.Count();
                     if (tagsCount > 0)
                     {
@@ -116,17 +119,32 @@ namespace Wiki.Infrastructure.Repositories
         }
 
 
-        public async Task<Article> GetAsync(int id)
+        public async Task<Article> GetAsync(int articleid, int textid)
         {
                 using(IDbConnection connection = new OracleConnection(settings.ConnectionString))
                 {
-                
-                
-                var xd = connection.Query<Article>("SELECT ID, Title, Category FROM Articles where Id = :id2", new { id2 = id });
+                var article = new Article(articleid);
+
+                var categoryQuery = $"Select * From Categories where ID = (Select categoryid from articles where id = {articleid})";
+                var category = (await connection.QueryAsync<ArticleCategory>(categoryQuery)).Single();
+                var textsQuery = $"Select Id, Articleid, Title, Content, Version from Texts where id = {textid}";
+                var text = (await connection.QueryAsync<Text>(textsQuery)).Single();
+                var userQuery = $"Select id, email from Users where id = (Select authorid from texts where id = {text.Id})";
+                var user = (await connection.QueryAsync<User>(userQuery)).Single();
+                var statusQuery = $"Select * from statuses where id = (Select statusid from texts where id = {text.Id})";
+                var status = (await connection.QueryAsync<TextStatus>(statusQuery)).Single();
+                var tagsQuery = $"Select id, tag from textstags tt, tags t where t.ID = tt.TAGID and textid = {text.Id}";
+                var tags = await connection.QueryAsync<TextTag>(tagsQuery);
+
+                text.SetAuthor(user);
+                text.SetStatus(status);
+                text.SetTags(tags);
+                article.SetCategory(category);
+                article.SetMaster(text);
                 //OracleDataReader reader = cmd.ExecuteReader();
                 //Console.WriteLine(reader.GetString(0));
-                
-                return xd.SingleOrDefault();
+
+                return article;
                 //Console.ReadLine();
                 }
         }

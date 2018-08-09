@@ -12,7 +12,7 @@ namespace Wiki.Web.ViewModels
         public SelectList Categories { get; set; }
         public string SelectedCategory { get; set; }
         public List<TagFilter> Tags { get; set; }
-        public IEnumerable<string> Statuses { get; set; }
+        public SelectList Statuses { get; set; }
     }
 
     public class TagFilter
@@ -26,6 +26,13 @@ namespace Wiki.Web.ViewModels
     {
         public int Id { get; set; }
         public string Category { get; set; }
+        public bool Selected { get; set; }
+    }
+
+    public class StatusFilter
+    {
+        public int Id { get; set; }
+        public string Status { get; set; }
         public bool Selected { get; set; }
     }
 }

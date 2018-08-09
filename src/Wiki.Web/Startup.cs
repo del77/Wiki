@@ -54,6 +54,7 @@ namespace Wiki.Web
                 .AddRazorPagesOptions(options =>
                 {
                     options.Conventions.AuthorizePage("/Articles/Add");
+                    
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
