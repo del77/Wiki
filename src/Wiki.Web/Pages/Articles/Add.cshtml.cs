@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Wiki.Infrastructure.DTO;
 using Wiki.Infrastructure.Services;
 using Wiki.Web.ViewModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace Wiki.Web.Pages.Articles
 {
@@ -22,13 +23,16 @@ namespace Wiki.Web.Pages.Articles
         [BindProperty]
         public ViewModels.Article Article { get; set; }
         [BindProperty]
-        public Filter Filter { get; set;
-        }
+        public Filter Filter { get; set; }
+        private readonly int userId;
+        public bool Editing { get; set; }
+        
         public AddModel(IArticleService articleService, IHttpContextAccessor httpContextAccessor)
         {
             Article = new Article();
             this.articleService = articleService;
             this.httpContextAccessor = httpContextAccessor;
+            userId = Convert.ToInt32(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
         }
 
         public async Task<IActionResult> OnGet(int articleid, int textid)
@@ -67,12 +71,19 @@ namespace Wiki.Web.Pages.Articles
                     tags.Add(new TagFilter
                     {
                         Id = tag.Id,
-                        Tag = tag.Tag
+                        Tag = tag.Tag,
+                        Checked = true
                     });
+                    Filter.Tags.Where(x => x.Id == tag.Id).Single().Checked = true;
                 }
                 Article.Tags = tags;
                 Article.Content = article.Master.Content;
                 Article.Title = article.Master.Title;
+                Editing = true;
+            }
+            else
+            {
+                Editing = false;
             }
             return Page();
         }
@@ -102,7 +113,7 @@ namespace Wiki.Web.Pages.Articles
                 //    Title = Article.Title
                 //};
 
-                await articleService.AddAsync(Article.Title, Article.Content, selectedTags, Article.Category.Id, 3);
+                await articleService.AddAsync(Article.Title, Article.Content, selectedTags, Article.Category.Id, userId);
             }
             
             await SetupFilter();
