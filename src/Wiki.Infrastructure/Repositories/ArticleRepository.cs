@@ -28,11 +28,19 @@ namespace Wiki.Infrastructure.Repositories
             {
                 //// art
                 var paramList = new DynamicParameters();
-                paramList.Add("CategoryID", article.Category.Id, direction: ParameterDirection.Input);
-                paramList.Add("Id", DbType.Int32, direction: ParameterDirection.Output);
+                int articleId;
+                if (article.Id == 0)
+                {
+                    paramList.Add("CategoryID", article.Category.Id, direction: ParameterDirection.Input);
+                    paramList.Add("Id", DbType.Int32, direction: ParameterDirection.Output);
 
-                connection.Execute("Insert into Articles (CategoryID) Values (:CategoryID) returning Id into :Id", paramList);
-                var articleId = paramList.Get<int>("Id");
+                    connection.Execute("Insert into Articles (CategoryID) Values (:CategoryID) returning Id into :Id", paramList);
+                    articleId = paramList.Get<int>("Id");
+                }
+                else
+                {
+                    articleId = article.Id;
+                }
                 //// art
 
                 //// text
@@ -181,6 +189,15 @@ namespace Wiki.Infrastructure.Repositories
         public async Task UpdateAsync(Article article)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task UpdateAsync(int textid, int status)
+        {
+            using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
+            {
+                var query = $"Update texts set statusid={status} where id={textid}";
+                await connection.QueryAsync(query);
+            }
         }
     }
 }

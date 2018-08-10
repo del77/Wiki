@@ -11,5 +11,6 @@ namespace Wiki.Infrastructure.Services
         Task<IEnumerable<ArticleDto>> BrowseAsync(string title, IEnumerable<int> selectedTags, int selectedCategory, int selectedStatus);
         Task<FilterInfo> GetFilterInfo();
         Task AddAsync(string title, string content, int[] selectedTags, int selectedCategory, int author);
+        Task ChangeStatus(int textid, int status);
     }
 }

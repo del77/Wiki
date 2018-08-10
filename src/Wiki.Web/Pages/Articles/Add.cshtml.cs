@@ -88,7 +88,7 @@ namespace Wiki.Web.Pages.Articles
             return Page();
         }
 
-        public async Task OnPostAsync(int[] selectedTags)
+        public async Task OnPostAsync(int[] selectedTags, Article Article = null)
         {
             if (ModelState.IsValid)
             {

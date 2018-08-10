@@ -1,0 +1,72 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Wiki.Infrastructure.DTO;
+using Wiki.Infrastructure.Services;
+using Wiki.Web.ViewModels;
+
+namespace Wiki.Web.Pages.Articles
+{
+    public class CompareModel : PageModel
+    {
+        private readonly IArticleService articleService;
+
+        public CompareModel(IArticleService articleService)
+        {
+            this.articleService = articleService;
+        }
+
+        public Article Article1 { get; set; }
+        public Article Article2 { get; set; }
+
+        public async Task OnGet(int articleid, int textid)
+        {
+            var master = (await articleService.BrowseAsync(null, new int[0], 0, 1)).Where(x => x.Id==articleid).SingleOrDefault();
+            var article1 = await articleService.GetAsync(articleid, textid);
+            var article2 = await articleService.GetAsync(articleid, master.Texts.SingleOrDefault().Id);
+            Article1 = CreateArticle(article1);
+            Article2 = CreateArticle(article2);
+            var xd = Article1.Content.Split("\r\n");
+        }
+
+        private Article CreateArticle(ArticleDetailsDto newArt)
+        {
+            Article article = new ViewModels.Article
+            {
+                ArticleId = newArt.Id,
+                TextId = newArt.Master.Id,
+                Category = new ViewModels.CategoryFilter
+                {
+                    Id = newArt.Category.Id,
+                    Category = newArt.Category.Category
+                },
+                Content = newArt.Master.Content,
+                Status = new ViewModels.StatusFilter
+                {
+                    Id = newArt.Master.Status.Id,
+                    Status = newArt.Master.Status.Status
+                },
+                Title = newArt.Master.Title,
+                Author = new Author
+                {
+                    Id = newArt.Master.Author.Id,
+                    Email = newArt.Master.Author.Email
+                }
+            };
+            var tags = new List<TagFilter>();
+            foreach (var tag in newArt.Master.Tags)
+            {
+                tags.Add(new TagFilter
+                {
+                    Id = tag.Id,
+                    Tag = tag.Tag
+                });
+            }
+            article.Tags = tags;
+            return article;
+        }
+    }
+}
