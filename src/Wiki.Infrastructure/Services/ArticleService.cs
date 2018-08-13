@@ -30,9 +30,9 @@ namespace Wiki.Infrastructure.Services
         }
 
 
-        public async Task<ArticleDetailsDto> GetAsync(int articleid, int textid)
+        public async Task<ArticleDetailsDto> GetAsync(int textid)
         {
-            var article = await articleRepository.GetAsync(articleid, textid);
+            var article = await articleRepository.GetAsync(textid);
             return mapper.Map<ArticleDetailsDto>(article);
         }
 
@@ -48,9 +48,10 @@ namespace Wiki.Infrastructure.Services
             return filter;
         }
 
-        public async Task AddAsync(string title, string content, int[] selectedTags, int selectedCategory, int author=0)
+        public async Task AddAsync(int articleId, string title, string content, int[] selectedTags, int selectedCategory, int author, double version)
         {
-            var article = new Article();
+            author = 0;
+            var article = new Article(articleId);
 
             var tags = new List<TextTag>();
             foreach (var tag in selectedTags)
@@ -60,8 +61,8 @@ namespace Wiki.Infrastructure.Services
 
             var user = new User(author);
 
-            var text = new Text(title, content, "1.0");
-            var status = new TextStatus(2);
+            var text = new Text(title, content, version);
+            var status = new TextStatus(2); // waiting
             text.SetStatus(status);
             text.SetTags(tags);
             text.SetAuthor(user);

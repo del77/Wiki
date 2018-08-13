@@ -27,13 +27,14 @@ namespace Wiki.Web.Pages.Articles
 
         public async Task<IActionResult> OnGet(int articleid, int textid)
         {
-            var article = await articleService.GetAsync(articleid, textid);
+            var article = await articleService.GetAsync(textid);
             if (!httpContextAccessor.HttpContext.User.IsInRole("Read") && article.Master.Status.Id != 1)
                 return Page();
             Article = new ViewModels.Article
             {
                 ArticleId = article.Id,
                 TextId = article.Master.Id,
+                Version = article.Master.Version,
                 Category = new ViewModels.CategoryFilter
                 {
                     Id = article.Category.Id,

@@ -18,6 +18,16 @@ body {
     line-height: 1.4;
 }
 
+ins {
+    background-color: #cfc;
+    text-decoration: none;
+}
+
+del {
+    color: #999;
+    background-color: #FEC8C8;
+}
+
 /* Make .svg files in the carousel display properly in older browsers */
 .carousel-inner .item img[src$=".svg"] {
     width: 100%;

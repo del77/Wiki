@@ -9,7 +9,7 @@ namespace Wiki.Core.Domain
         private IList<string> suggestions = new List<string>();
         private ISet<TextTag> tags = new HashSet<TextTag>();
 
-        public Text(string title, string content, string version)
+        public Text(string title, string content, double version)
         {
             Title = title;
             Content = content;
@@ -40,7 +40,7 @@ namespace Wiki.Core.Domain
         public int ArticleId { get;  set; }
         public string Title { get;  set; }
         public User Author { get;  set; }
-        public string Version { get; set; }
+        public double Version { get; set; }
 
         public IEnumerable<string> Suggestions
         {

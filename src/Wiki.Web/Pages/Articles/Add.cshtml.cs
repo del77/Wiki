@@ -35,12 +35,12 @@ namespace Wiki.Web.Pages.Articles
             userId = Convert.ToInt32(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
         }
 
-        public async Task<IActionResult> OnGet(int articleid, int textid)
+        public async Task<IActionResult> OnGet(int textid)
         {
-            await SetupFilter();
+            await SetupFilter(new int[0]);
             if (textid != 0)
             {
-                var article = await articleService.GetAsync(articleid, textid);
+                var article = await articleService.GetAsync(textid);
                 if (!httpContextAccessor.HttpContext.User.IsInRole("Read") && article.Master.Status.Id != 1)
                     return Page();
                 Article = new ViewModels.Article
@@ -92,34 +92,25 @@ namespace Wiki.Web.Pages.Articles
         {
             if (ModelState.IsValid)
             {
-                //OracleCommand cmd = new OracleCommand()
-                var article = new ArticleDetailsDto();
-                //article.Category = new ArticleCategoryDto { Id = article.Category.Id };
+                if (Article.TextId != 0)
+                {
+                    var article = await articleService.GetAsync(Article.TextId);
+                    Article.Version = article.Master.Version + 0.1;
+                    Article.Category = new CategoryFilter
+                    {
+                        Id = article.Category.Id
+                    };
+                }
+                else
+                    Article.Version = 1.0;
 
-                //var tags = new List<TextTagDto>();
-                //foreach(var tag in selectedTags)
-                //{
-                //    tags.Add(new TextTagDto
-                //    {
-                //        Id = tag
-                //    });
-                //}
-
-                //article.Text = new TextDetailsDto
-                //{
-                //    //Author
-                //    Content = Article.Content,
-                //    Tags = tags,
-                //    Title = Article.Title
-                //};
-
-                await articleService.AddAsync(Article.Title, Article.Content, selectedTags, Article.Category.Id, userId);
+                await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, selectedTags, Article.Category.Id, userId, Article.Version);
             }
             
-            await SetupFilter();
+            await SetupFilter(selectedTags);
         }
 
-        private async Task SetupFilter()
+        private async Task SetupFilter(int[] selectedTags)
         {
             var filter = await articleService.GetFilterInfo();
             var categories = new List<CategoryFilter>();
@@ -154,6 +145,11 @@ namespace Wiki.Web.Pages.Articles
                     Tag = tag.Tag,
                     Checked = false
                 });
+            }
+
+            foreach(var tag in selectedTags)
+            {
+                Filter.Tags.Single(x => x.Id == tag).Checked = true;
             }
 
             //if (selectedCategory != 0)

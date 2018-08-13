@@ -13,7 +13,7 @@
         <p>
             Find by name:
         </p>
-        <input type="text" name="title" value="@Model.Filter.Title" />
+        <input type="search" name="title" value="@Model.Filter.Title" class="glyphicon-search" />
         <label>Category</label>
         <select asp-items="@Model.Filter.Categories" name="selectedCategory"></select>
         @if (Model.CanRead)
@@ -21,7 +21,7 @@
             <label>Status</label>
             <select asp-items="@Model.Filter.Statuses" name="selectedStatus"></select>
         }
-        <table>
+        <table class="table-responsive">
             <tr>
                 @{
                     foreach (var tag in Model.Filter.Tags)

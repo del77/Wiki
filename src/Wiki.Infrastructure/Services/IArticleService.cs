@@ -7,10 +7,10 @@ namespace Wiki.Infrastructure.Services
 {
     public interface IArticleService : IService
     {
-        Task<ArticleDetailsDto> GetAsync(int articleid, int textid);
+        Task<ArticleDetailsDto> GetAsync(int textid);
         Task<IEnumerable<ArticleDto>> BrowseAsync(string title, IEnumerable<int> selectedTags, int selectedCategory, int selectedStatus);
         Task<FilterInfo> GetFilterInfo();
-        Task AddAsync(string title, string content, int[] selectedTags, int selectedCategory, int author);
+        Task AddAsync(int articleId, string title, string content, int[] selectedTags, int selectedCategory, int author, double Version);
         Task ChangeStatus(int textid, int status);
     }
 }

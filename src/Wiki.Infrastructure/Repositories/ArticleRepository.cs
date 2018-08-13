@@ -127,16 +127,16 @@ namespace Wiki.Infrastructure.Repositories
         }
 
 
-        public async Task<Article> GetAsync(int articleid, int textid)
+        public async Task<Article> GetAsync(int textid)
         {
                 using(IDbConnection connection = new OracleConnection(settings.ConnectionString))
                 {
-                var article = new Article(articleid);
 
-                var categoryQuery = $"Select * From Categories where ID = (Select categoryid from articles where id = {articleid})";
-                var category = (await connection.QueryAsync<ArticleCategory>(categoryQuery)).Single();
                 var textsQuery = $"Select Id, Articleid, Title, Content, Version from Texts where id = {textid}";
                 var text = (await connection.QueryAsync<Text>(textsQuery)).Single();
+                var article = new Article(text.ArticleId);
+                var categoryQuery = $"Select * From Categories where ID = (Select categoryid from articles where id = {article.Id})";
+                var category = (await connection.QueryAsync<ArticleCategory>(categoryQuery)).Single();
                 var userQuery = $"Select id, email from Users where id = (Select authorid from texts where id = {text.Id})";
                 var user = (await connection.QueryAsync<User>(userQuery)).Single();
                 var statusQuery = $"Select * from statuses where id = (Select statusid from texts where id = {text.Id})";

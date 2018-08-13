@@ -18,5 +18,6 @@ namespace Wiki.Web.ViewModels
         public CategoryFilter Category { get; set; }
         public List<TagFilter> Tags { get; set; }
         public StatusFilter Status { get; set; }
+        public double Version { get; set; }
     }
 }

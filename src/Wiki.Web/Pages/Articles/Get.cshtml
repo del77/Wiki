@@ -15,7 +15,7 @@
     }
 </style>
 <div class="row">
-    <div class="col-md-10">
+    <div class="col-md-12">
         <h2>@Model.Article.Title</h2>
         <p>Author: @Model.Article.Author.Email</p>
         <p>Tags: @Model.Article.Tags.Select(x => x.Tag).AsString()</p>
@@ -25,21 +25,23 @@
             <p>Status: @Model.Article.Status.Status</p>
 
         }
-        @Html.Raw("<div class=\"article\">" + Model.Article.Content + "</div>")
     </div>
+        <div class="col-md-10">
+        @Html.Raw("<div class=\"article\">" + Model.Article.Content + "</div>")
+        </div>
     @if (Model.HttpContext.User.Identity.IsAuthenticated)
     {
-    <div class="col-md-1 col-md-offset-12 table-bordered">
-        <a asp-page="/Articles/Add" asp-route-articleid="@Model.Article.ArticleId" asp-route-textid="@Model.Article.TextId">Edit</a>
+    <div class="col-md-2 table-bordered" style="float:right">
+        <a asp-page="/Articles/Add" asp-route-textid="@Model.Article.TextId">Edit</a><br />
 
         @if (@Model.Article.Status.Status == "Waiting" && HttpContextAccessor.HttpContext.User.IsInRole("Accept"))
         {
-            <a asp-page="/Articles/Modify" asp-route-articleid="@Model.Article.ArticleId" asp-route-textid="@Model.Article.TextId" asp-route-status="22">Accept</a>
-            <a asp-page="/Articles/Modify" asp-route-articleid="@Model.Article.ArticleId" asp-route-textid="@Model.Article.TextId" asp-route-status="3">Reject</a>
+            <a asp-page="/Articles/Modify" asp-route-textid="@Model.Article.TextId" asp-route-status="22">Accept</a><br/>
+            <a asp-page="/Articles/Modify" asp-route-textid="@Model.Article.TextId" asp-route-status="3">Reject</a><br/>
         }
         @if (HttpContextAccessor.HttpContext.User.IsInRole("Read"))
         {
-            <a asp-page="/Articles/Compare" asp-route-articleid="@Model.Article.ArticleId" asp-route-textid="@Model.Article.TextId">Compare to master</a>
+            <a asp-page="/Articles/Compare" asp-route-textid="@Model.Article.TextId">Compare to master</a><br />
 
         }
         @if (@Model.Article.Status.Status == "Accepted" && HttpContextAccessor.HttpContext.User.IsInRole("Publish"))
