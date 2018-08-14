@@ -8,5 +8,6 @@ namespace Wiki.Infrastructure.DTO
     {
         public string Content { get; set; }
         public UserDto Author { get; set; }
+        public string TextComment { get; set; }
     }
 }

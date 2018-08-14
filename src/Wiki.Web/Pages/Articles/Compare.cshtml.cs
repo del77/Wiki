@@ -48,6 +48,7 @@ namespace Wiki.Web.Pages.Articles
             {
                 ArticleId = newArt.Id,
                 TextId = newArt.Master.Id,
+                Version = newArt.Master.Version,
                 Category = new ViewModels.CategoryFilter
                 {
                     Id = newArt.Category.Id,

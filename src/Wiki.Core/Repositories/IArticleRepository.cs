@@ -15,6 +15,6 @@ namespace Wiki.Core.Repositories
         Task<IEnumerable<ArticleCategory>> GetCategories();
         Task<IEnumerable<TextTag>> GetTags();
         Task<IEnumerable<TextStatus>> GetStatuses();
-        Task UpdateAsync(int textid, int status);
+        Task UpdateAsync(int textid, int status, string comment);
     }
 }

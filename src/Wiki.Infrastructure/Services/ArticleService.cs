@@ -75,9 +75,9 @@ namespace Wiki.Infrastructure.Services
             await articleRepository.AddAsync(article);
         }
 
-        public async Task ChangeStatus(int textid, int status)
+        public async Task ChangeStatus(int textid, int status, string comment="")
         {
-            await articleRepository.UpdateAsync(textid, status);
+            await articleRepository.UpdateAsync(textid, status, comment);
         }
     }
 }

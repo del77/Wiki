@@ -132,7 +132,7 @@ namespace Wiki.Infrastructure.Repositories
                 using(IDbConnection connection = new OracleConnection(settings.ConnectionString))
                 {
 
-                var textsQuery = $"Select Id, Articleid, Title, Content, Version from Texts where id = {textid}";
+                var textsQuery = $"Select Id, Articleid, Title, Content, Version, textComment from Texts where id = {textid}";
                 var text = (await connection.QueryAsync<Text>(textsQuery)).Single();
                 var article = new Article(text.ArticleId);
                 var categoryQuery = $"Select * From Categories where ID = (Select categoryid from articles where id = {article.Id})";
@@ -191,11 +191,15 @@ namespace Wiki.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task UpdateAsync(int textid, int status)
+        public async Task UpdateAsync(int textid, int status, string comment="")
         {
             using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
             {
-                var query = $"Update texts set statusid={status} where id={textid}";
+                string query;
+                if(comment == "")
+                    query = $"Update texts set statusid={status} where id={textid}";
+                else
+                    query = $"Update texts set statusid={status}, textcomment='{comment}' where id={textid}";
                 await connection.QueryAsync(query);
             }
         }

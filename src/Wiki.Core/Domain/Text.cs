@@ -41,6 +41,7 @@ namespace Wiki.Core.Domain
         public string Title { get;  set; }
         public User Author { get;  set; }
         public double Version { get; set; }
+        public string TextComment { get; set; }
 
         public IEnumerable<string> Suggestions
         {

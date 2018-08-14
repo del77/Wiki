@@ -19,5 +19,6 @@ namespace Wiki.Web.ViewModels
         public List<TagFilter> Tags { get; set; }
         public StatusFilter Status { get; set; }
         public double Version { get; set; }
+        public string Comment { get; set; }
     }
 }

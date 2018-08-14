@@ -94,11 +94,15 @@ namespace Wiki.Web.Pages.Articles
             {
                 if (Article.TextId != 0)
                 {
-                    var article = await articleService.GetAsync(Article.TextId);
-                    Article.Version = article.Master.Version + 0.1;
+                    
+                    var editedArticle = await articleService.GetAsync(Article.TextId);
+                    var master = (await articleService.BrowseAsync(null, new int[0], 0, 1)).Where(x => x.Id == editedArticle.Id).SingleOrDefault();
+                    var masterDetails = await articleService.GetAsync(master.Master.Id);
+
+                    Article.Version = masterDetails.Master.Version + 0.1;
                     Article.Category = new CategoryFilter
                     {
-                        Id = article.Category.Id
+                        Id = masterDetails.Category.Id
                     };
                 }
                 else

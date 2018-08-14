@@ -25,7 +25,7 @@ namespace Wiki.Web.Pages.Articles
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<IActionResult> OnGet(int articleid, int textid)
+        public async Task<IActionResult> OnGetAsync(int articleid, int textid)
         {
             var article = await articleService.GetAsync(textid);
             if (!httpContextAccessor.HttpContext.User.IsInRole("Read") && article.Master.Status.Id != 1)
@@ -35,6 +35,7 @@ namespace Wiki.Web.Pages.Articles
                 ArticleId = article.Id,
                 TextId = article.Master.Id,
                 Version = article.Master.Version,
+                Comment = article.Master.TextComment,
                 Category = new ViewModels.CategoryFilter
                 {
                     Id = article.Category.Id,
@@ -65,5 +66,6 @@ namespace Wiki.Web.Pages.Articles
             Article.Tags = tags;
             return Page();
         }
+
     }
 }

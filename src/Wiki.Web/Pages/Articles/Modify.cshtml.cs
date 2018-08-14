@@ -19,10 +19,19 @@ namespace Wiki.Web.Pages.Articles
             this.articleSerivce = articleSerivce;
             this.httpContextAccessor = httpContextAccessor;
         }
-        public async void OnGet(int textid, int status)
+        public async void OnGetAsync(int textid, int status)
         {
             if (httpContextAccessor.HttpContext.User.IsInRole("Accept"))
                 await articleSerivce.ChangeStatus(textid, status);
+        }
+
+        public async void OnPostAsync(int textid, string reason)
+        {
+            if (httpContextAccessor.HttpContext.User.IsInRole("Accept"))
+            {
+                int rejectedStatus = 3;
+                await articleSerivce.ChangeStatus(textid, rejectedStatus, reason);
+            }
         }
     }
 }
