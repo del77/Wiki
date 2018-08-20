@@ -20,10 +20,9 @@
         <p>Author: @Model.Article.Author.Email</p>
         <p>Tags: @Model.Article.Tags.Select(x => x.Tag).AsString()</p>
         <p>Category: @Model.Article.Category.Category</p>
-        @if(Model.Article.Comment != null)
+        @if (Model.Article.Comment != null)
         {
             <p class="text-info">Comment to this version: @Model.Article.Comment</p>
-
         }
         @if (HttpContextAccessor.HttpContext.User.IsInRole("Read"))
         {
@@ -36,29 +35,30 @@
     </div>
     @if (Model.HttpContext.User.Identity.IsAuthenticated)
     {
-        <div class="col-md-2 table-bordered" style="float:right">
-            <a asp-page="/Articles/Add" asp-route-textid="@Model.Article.TextId">Edit</a><br />
+    <div class="col-md-2 table-bordered" style="float:right">
+        <a asp-page="/Articles/Add" asp-route-textid="@Model.Article.TextId">Edit</a><br />
 
-            @if (@Model.Article.Status.Status == "Waiting" && HttpContextAccessor.HttpContext.User.IsInRole("Accept"))
-            {
-                <a asp-page="/Articles/Modify" asp-route-textid="@Model.Article.TextId" asp-route-status="22">Accept</a><br />
-                <a data-toggle="modal" data-target="#myModal">Reject</a>
-            }
-            @if (HttpContextAccessor.HttpContext.User.IsInRole("Read"))
-            {
-                <a asp-page="/Articles/Compare" asp-route-textid="@Model.Article.TextId">Compare to master</a><br />
+        @if (@Model.Article.Status.Status == "Waiting" && HttpContextAccessor.HttpContext.User.IsInRole("Accept"))
+        {
+            <a asp-page="/Articles/Modify" asp-route-textid="@Model.Article.TextId" asp-route-status="22">Accept</a><br />
+            <a data-toggle="modal" data-target="#rejectModal">Reject</a>
+        }
+        @if (HttpContextAccessor.HttpContext.User.IsInRole("Read"))
+        {
+            @*<a asp-page="/Articles/Compare" asp-route-textid="@Model.Article.TextId">Compare to master</a><br />*@
+            <a data-toggle="modal" data-target="#comparisionModal">Compare to master</a><br/>
 
-            }
-            @if (@Model.Article.Status.Status == "Accepted" && HttpContextAccessor.HttpContext.User.IsInRole("Publish"))
-            {
-                <a asp-page="./Articles/Modify" asp-route-textid="@Model.Article.TextId" asp-route-status="1">Make Master</a>
-            }
-        </div>
+        }
+        @if (@Model.Article.Status.Status == "Accepted" && HttpContextAccessor.HttpContext.User.IsInRole("Publish"))
+        {
+            <a asp-page="/Articles/Modify" asp-route-textid="@Model.Article.TextId" asp-route-status="1">Make Master</a><br/>
+        }
+    </div>
     }
 
 
     <!-- The Modal -->
-    <div class="modal fade" id="myModal">
+    <div class="modal fade" id="rejectModal">
         <div class="modal-dialog">
             <div class="modal-content">
 
@@ -71,7 +71,7 @@
                 <!-- Modal body -->
                 <form asp-page="./Modify" method="post">
                     <div class="modal-body">
-                        <input type="hidden" name="textid" value="@Model.Article.TextId"/>    
+                        <input type="hidden" name="textid" value="@Model.Article.TextId" />
                         <textarea name="reason"></textarea>
                     </div>
 
@@ -81,6 +81,35 @@
                         <button type="submit" class="btn btn-danger">Submit</button>
                     </div>
                 </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Trigger/Open The Modal -->
+    <!-- The Modal -->
+    <div class="modal fade" id="comparisionModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Comparision:</h4>
+                    @Html.Raw(Model.TitleComparision)
+                </div>
+
+                <!-- Modal body -->
+ 
+                <div class="modal-body">
+                    @Html.Raw("<div class=\"article\">" + Model.ContentComparision + "</div>")
+                </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger center-block" data-dismiss="modal">Close</button>
+                        
+                    </div>
+ 
 
             </div>
         </div>

@@ -50,6 +50,7 @@ namespace Wiki.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddKendo();
             services.AddMvc()
                 .AddRazorPagesOptions(options =>
                 {

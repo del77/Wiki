@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Wiki.Infrastructure.DTO;
 using Wiki.Infrastructure.Services;
 using Wiki.Web.ViewModels;
+using X.PagedList;
 
 namespace Wiki.Web.Pages
 {
@@ -16,8 +19,10 @@ namespace Wiki.Web.Pages
         private readonly IArticleService articleService;
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        [BindProperty]
         public List<ViewModels.Article> Articles { get; set; }
+        [BindProperty]
+        public StaticPagedList<ViewModels.Article> ArticlesPaged { get; set; }
+
         [BindProperty]
         public Filter Filter { get; set; }
         public bool CanRead { get; set; }
@@ -41,6 +46,8 @@ namespace Wiki.Web.Pages
             if (!CanRead)
                 selectedStatus = 1;
             var res = await articleService.BrowseAsync(title, selectedTags, selectedCategory, selectedStatus);
+            var res2 = (await articleService.BrowseAsync(title, selectedTags, selectedCategory, selectedStatus)).ToPagedList(1, 5);
+
             Articles = new List<ViewModels.Article>();
             foreach (var item in res)
             {
@@ -77,6 +84,7 @@ namespace Wiki.Web.Pages
                     Articles.Add(article);
                 }
             }
+            ArticlesPaged = new StaticPagedList<Article>(Articles, 1, 4, Articles.Count());
             return Page();
         }
 

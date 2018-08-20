@@ -6,7 +6,7 @@ namespace Wiki.Core.Domain
     public class Text
     {
         // private IList<Suggestion> suggestions = new List<Suggestion>();
-        private IList<string> suggestions = new List<string>();
+        private IList<Suggestion> suggestions = new List<Suggestion>();
         private ISet<TextTag> tags = new HashSet<TextTag>();
 
         public Text(string title, string content, double version)
@@ -43,7 +43,7 @@ namespace Wiki.Core.Domain
         public double Version { get; set; }
         public string TextComment { get; set; }
 
-        public IEnumerable<string> Suggestions
+        public IEnumerable<Suggestion> Suggestions
         {
             get => suggestions;
             protected set { }

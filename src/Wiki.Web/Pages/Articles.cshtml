@@ -1,11 +1,16 @@
 ﻿@page
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 @model ArticlesModel
-
+@using Kendo.Mvc.UI
+@using System.Collections.Generic
+@using X.PagedList.Mvc;
+@using X.PagedList;
+@addTagHelper *, Kendo.Mvc
 @{
     ViewData["Title"] = "About";
 }
 <h2>@ViewData["Title"]</h2>
+
 
 <form asp-page="./Articles" method="get">
 
@@ -37,12 +42,16 @@
                 @:</tr>
                 }
             </table>
-        
 
             <input type="submit" value="Search" class="btn btn-default" />
+
         </div>
     </form>
     <a asp-page="./Articles">Back to full List</a>
+
+
+
+
 
     <table class="table">
         <thead>
@@ -81,4 +90,6 @@
                 </tr>
             }
         </tbody>
+        
+
     </table>

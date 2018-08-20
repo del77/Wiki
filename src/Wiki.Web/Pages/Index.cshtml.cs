@@ -19,15 +19,16 @@ namespace Wiki.Web.Pages
         //ICommandDispatcher commandDispatcher; dodac do konstruktora
         IUserService userService;
         IArticleService articleService;
-
+        private readonly ISuggestionService suggestionService;
 
         [BindProperty]
         public string Customer { get; set; }
-        public IndexModel(IUserService userService, IArticleService articleService)
+        public IndexModel(IUserService userService, IArticleService articleService, ISuggestionService suggestionService)
         {
             //this.commandDispatcher = commandDispatcher;    
             this.userService = userService;
             this.articleService = articleService;
+            this.suggestionService = suggestionService;
         }
         public async Task OnGet()
         {
@@ -39,6 +40,11 @@ namespace Wiki.Web.Pages
             //var articledto = await articleService.GetAsync(1);
             //var userdto = await userService.GetAsync("user1@email.com");
             //User = userdto.Email;
+        }
+
+        public async Task OnPostAsync()
+        {
+
         }
     }
 }

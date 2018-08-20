@@ -3,12 +3,44 @@
 @{
     ViewData["Title"] = "Home page";
 }
+<a data-toggle="modal" data-target="#suggestionModal" class="btn btn-default">Add suggestion</a>
+
+
+<!-- The Modal -->
+<div class="modal fade" id="suggestionModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Suggestion:</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <form asp-page="./Modify" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="textid" value="@Model.Customer" />
+                    <textarea name="suggestion"></textarea>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Submit</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
 <p>test</p>
 <div asp-validation-summary="All"></div>
-    <form method="POST">
-        <div>Name: <input asp-for="Customer" /></div>
-        <input type="submit" />
-    </form>
+<form method="POST">
+    <div>Name: <input asp-for="Customer" /></div>
+    <input type="submit" />
+</form>
 <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
     <ol class="carousel-indicators">
         <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
