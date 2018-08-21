@@ -23,6 +23,7 @@ namespace Wiki.Core.Domain
 
         public User(int author)
         {
+            Id = author;
         }
     }
 }

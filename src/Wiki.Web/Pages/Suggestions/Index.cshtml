@@ -1,0 +1,53 @@
+﻿@page
+@model Wiki.Web.Pages.Suggestions.IndexModel
+@{
+    ViewData["Title"] = "AdminPanel";
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                User
+            </th>
+            <th>
+                Article
+            </th>
+            <th>
+                Suggestion
+            </th>
+            @if(Model.User.IsInRole("Publish"))
+            {
+                <th>
+
+                </th>
+
+            }
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Suggestions)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Author.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Article.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Content)
+            </td>
+            <td>
+            @if (Model.User.IsInRole("Publish") && item.Status == 0)
+            {
+                <a asp-page="./ChangeStatus" asp-route-id="@item.Id">Serve</a>
+            }
+            </td>
+        </tr>
+        }
+    </tbody>
+
+
+</table>

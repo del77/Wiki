@@ -14,6 +14,13 @@ namespace Wiki.Core.Domain
             Title = title;
             Content = content;
             Version = version;
+            CreatedAt = DateTime.Now;
+        }
+
+        public Text(int id)
+        {
+            Id = id;
+            CreatedAt = DateTime.Now;
         }
 
         protected Text()
@@ -42,6 +49,7 @@ namespace Wiki.Core.Domain
         public User Author { get;  set; }
         public double Version { get; set; }
         public string TextComment { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public IEnumerable<Suggestion> Suggestions
         {

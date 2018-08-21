@@ -20,5 +20,6 @@ namespace Wiki.Web.ViewModels
         public StatusFilter Status { get; set; }
         public double Version { get; set; }
         public string Comment { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

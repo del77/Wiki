@@ -31,7 +31,11 @@ namespace Wiki.Infrastructure.Services
             return mapper.Map<UserDto>(user);
         }
 
-        
+        public async Task<UserDto> GetAsync(int id)
+        {
+            var user = await userRepository.GetAsync(id);
+            return mapper.Map<UserDto>(user);
+        }
 
         public async Task LoginAsync(string email, string password)
         {

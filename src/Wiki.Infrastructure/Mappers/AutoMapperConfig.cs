@@ -20,6 +20,7 @@ namespace Wiki.Infrastructure.Mappers
                 cfg.CreateMap<TextTag, TextTagDto>();
                 cfg.CreateMap<TextStatus, TextStatusDto>();
                 cfg.CreateMap<ArticleCategory, ArticleCategoryDto>();
+                cfg.CreateMap<Suggestion, SuggestionDto>();
             })
             .CreateMapper();
         }

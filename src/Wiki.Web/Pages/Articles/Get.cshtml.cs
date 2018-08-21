@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,18 +16,24 @@ namespace Wiki.Web.Pages.Articles
     public class GetModel : PageModel
     {
         private readonly IArticleService articleService;
+        private readonly ISuggestionService suggestionService;
         private readonly IHttpContextAccessor httpContextAccessor;
-
+        public readonly ClaimsPrincipal User;
         [BindProperty]
         public ViewModels.Article Article { get; set; }
         [BindProperty]
         public string ContentComparision { get; set; }
         public string TitleComparision { get; set; }
 
-        public GetModel(IArticleService articleService, IHttpContextAccessor httpContextAccessor)
+        [BindProperty]
+        public Suggestion Suggestion { get; set; }
+
+        public GetModel(IArticleService articleService, ISuggestionService suggestionService, IHttpContextAccessor httpContextAccessor)
         {
             this.articleService = articleService;
+            this.suggestionService = suggestionService;
             this.httpContextAccessor = httpContextAccessor;
+            User = httpContextAccessor.HttpContext.User;
         }
 
         public async Task<IActionResult> OnGetAsync(int articleid, int textid)
@@ -83,6 +90,13 @@ namespace Wiki.Web.Pages.Articles
             return Page();
         }
 
+        public async Task OnPostAsync()
+        {
+            int? user = Suggestion.IsAnonymous ? (int?)null : Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
+            await suggestionService.AddAsync(user, Article.TextId, Suggestion.Content);
+            await OnGetAsync(Article.ArticleId, Article.TextId);
+        }
+
 
 
         private Article CreateArticle(ArticleDetailsDto newArt)
@@ -93,6 +107,7 @@ namespace Wiki.Web.Pages.Articles
                 TextId = newArt.Master.Id,
                 Version = newArt.Master.Version,
                 Comment = newArt.Master.TextComment,
+                CreatedAt = newArt.Master.CreatedAt,
                 Category = new ViewModels.CategoryFilter
                 {
                     Id = newArt.Category.Id,

@@ -52,7 +52,8 @@ namespace Wiki.Infrastructure.Repositories
                 paramList.Add("Title", article.Master.Title, direction: ParameterDirection.Input);
                 paramList.Add("Version", article.Master.Version, direction: ParameterDirection.Input);
                 paramList.Add("Id", DbType.Int32, direction: ParameterDirection.Output);
-                connection.Execute("Insert into Texts (articleid, authorid, statusid, content, title, version) Values (:ArticleID, :AuthorID, :StatusID, :Content, :Title, :Version) returning Id into :Id", paramList);
+                paramList.Add("CreatedAt", article.Master.CreatedAt, direction: ParameterDirection.Input);
+                connection.Execute("Insert into Texts (articleid, authorid, statusid, content, title, version, createdat) Values (:ArticleID, :AuthorID, :StatusID, :Content, :Title, :Version, :CreatedAt) returning Id into :Id", paramList);
                 var textId = paramList.Get<int>("Id");
                 //// text
 
@@ -65,7 +66,7 @@ namespace Wiki.Infrastructure.Repositories
             }
         }
 
-        public async Task<IEnumerable<Article>> GetAllAsync(IEnumerable<int> selectedTags, string title, int selectedCategory, int selectedStatus)
+        public async Task<IEnumerable<Article>> GetAllAsync(IEnumerable<int> selectedTags, string title, int selectedCategory, int selectedStatus, int selectedArticle)
         {
             if (title == null)
                 title = "";
@@ -73,6 +74,8 @@ namespace Wiki.Infrastructure.Repositories
             var articleQuery = "SELECT a.ID FROM Articles a";
             if (selectedCategory != 0)
                 articleQuery += $" where categoryid={selectedCategory}";
+            else if(selectedArticle != 0)
+                articleQuery += $" where a.ID={selectedArticle}";
 
             using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
             {
@@ -129,32 +132,32 @@ namespace Wiki.Infrastructure.Repositories
 
         public async Task<Article> GetAsync(int textid)
         {
-                using(IDbConnection connection = new OracleConnection(settings.ConnectionString))
-                {
+            using(IDbConnection connection = new OracleConnection(settings.ConnectionString))
+            {
 
-                var textsQuery = $"Select Id, Articleid, Title, Content, Version, textComment from Texts where id = {textid}";
-                var text = (await connection.QueryAsync<Text>(textsQuery)).Single();
-                var article = new Article(text.ArticleId);
-                var categoryQuery = $"Select * From Categories where ID = (Select categoryid from articles where id = {article.Id})";
-                var category = (await connection.QueryAsync<ArticleCategory>(categoryQuery)).Single();
-                var userQuery = $"Select id, email from Users where id = (Select authorid from texts where id = {text.Id})";
-                var user = (await connection.QueryAsync<User>(userQuery)).Single();
-                var statusQuery = $"Select * from statuses where id = (Select statusid from texts where id = {text.Id})";
-                var status = (await connection.QueryAsync<TextStatus>(statusQuery)).Single();
-                var tagsQuery = $"Select id, tag from textstags tt, tags t where t.ID = tt.TAGID and textid = {text.Id}";
-                var tags = await connection.QueryAsync<TextTag>(tagsQuery);
+            var textsQuery = $"Select Id, Articleid, Title, Content, Version, CreatedAt, textComment from Texts where id = {textid}";
+            var text = (await connection.QueryAsync<Text>(textsQuery)).Single();
+            var article = new Article(text.ArticleId);
+            var categoryQuery = $"Select * From Categories where ID = (Select categoryid from articles where id = {article.Id})";
+            var category = (await connection.QueryAsync<ArticleCategory>(categoryQuery)).Single();
+            var userQuery = $"Select id, email from Users where id = (Select authorid from texts where id = {text.Id})";
+            var user = (await connection.QueryAsync<User>(userQuery)).Single();
+            var statusQuery = $"Select * from statuses where id = (Select statusid from texts where id = {text.Id})";
+            var status = (await connection.QueryAsync<TextStatus>(statusQuery)).Single();
+            var tagsQuery = $"Select id, tag from textstags tt, tags t where t.ID = tt.TAGID and textid = {text.Id}";
+            var tags = await connection.QueryAsync<TextTag>(tagsQuery);
 
-                text.SetAuthor(user);
-                text.SetStatus(status);
-                text.SetTags(tags);
-                article.SetCategory(category);
-                article.SetMaster(text);
-                //OracleDataReader reader = cmd.ExecuteReader();
-                //Console.WriteLine(reader.GetString(0));
+            text.SetAuthor(user);
+            text.SetStatus(status);
+            text.SetTags(tags);
+            article.SetCategory(category);
+            article.SetMaster(text);
+            //OracleDataReader reader = cmd.ExecuteReader();
+            //Console.WriteLine(reader.GetString(0));
 
-                return article;
-                //Console.ReadLine();
-                }
+            return article;
+            //Console.ReadLine();
+            }
         }
 
         public async Task<IEnumerable<ArticleCategory>> GetCategories()

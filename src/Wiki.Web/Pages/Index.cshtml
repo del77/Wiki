@@ -1,8 +1,10 @@
 ﻿@page
 @model IndexModel
+
 @{
     ViewData["Title"] = "Home page";
 }
+
 <a data-toggle="modal" data-target="#suggestionModal" class="btn btn-default">Add suggestion</a>
 
 
@@ -20,8 +22,12 @@
             <!-- Modal body -->
             <form asp-page="./Modify" method="post">
                 <div class="modal-body">
-                    <input type="hidden" name="textid" value="@Model.Customer" />
-                    <textarea name="suggestion"></textarea>
+                    @if (Model.User.Identity.IsAuthenticated)
+                    {
+                        <input type="checkbox" asp-for="@Model.Suggestion.IsAnonymous"/>
+                        <label>Add as anonymous user</label><br/>
+                    }
+                    <textarea asp-for="@Model.Suggestion.Content"></textarea>
                 </div>
 
                 <!-- Modal footer -->
@@ -35,12 +41,7 @@
     </div>
 </div>
 
-<p>test</p>
-<div asp-validation-summary="All"></div>
-<form method="POST">
-    <div>Name: <input asp-for="Customer" /></div>
-    <input type="submit" />
-</form>
+
 <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
     <ol class="carousel-indicators">
         <li data-target="#myCarousel" data-slide-to="0" class="active"></li>

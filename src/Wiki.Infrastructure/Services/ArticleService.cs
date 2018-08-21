@@ -23,9 +23,9 @@ namespace Wiki.Infrastructure.Services
 
 
 
-        public async Task<IEnumerable<ArticleDto>> BrowseAsync(string title, IEnumerable<int> selectedTags, int selectedCategory, int selectedStatus)
+        public async Task<IEnumerable<ArticleDto>> BrowseAsync(string title, IEnumerable<int> selectedTags, int selectedCategory, int selectedStatus, int selectedArticle=0)
         {
-            var articles = await articleRepository.GetAllAsync(selectedTags, title, selectedCategory, selectedStatus);
+            var articles = await articleRepository.GetAllAsync(selectedTags, title, selectedCategory, selectedStatus, selectedCategory);
             return mapper.Map<IEnumerable<ArticleDto>>(articles);
         }
 

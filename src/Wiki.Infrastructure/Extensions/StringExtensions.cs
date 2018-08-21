@@ -12,5 +12,6 @@ namespace Wiki.Infrastructure.Extensions
                 return true;
             return false;
         }
+
     }
 }

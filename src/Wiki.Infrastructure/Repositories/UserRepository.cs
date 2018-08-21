@@ -36,9 +36,11 @@ namespace Wiki.Infrastructure.Repositories
 
         public async Task<User> GetAsync(int id)
         {
-
-
-            return null;
+            using (IDbConnection con = new OracleConnection(settings.ConnectionString))
+            {
+                var user = con.Query<User>("SELECT * FROM Users where id = :Id", new { Id = id });
+                return user.SingleOrDefault();
+            }
         }
 
         public async Task<User> GetAsync(string email)
@@ -50,19 +52,8 @@ namespace Wiki.Infrastructure.Repositories
         
                 using(IDbConnection con = new OracleConnection(settings.ConnectionString))
                 {
-                con.Open();
-                //Console.WriteLine("Connected to Oracle Database {0}", con.ServerVersion);
-
-                //var orderDetail = con.Query<User>("Select * from TABLE1", null);
-                //var newuser = new User(Guid.NewGuid(), "user2@email.com", "secret", "salt");
-                //con.Execute("Insert into Users (Id, Email, Password, Salt) Values (:id, :email, :pass, :salt)", new {id = newuser.Id.ToByteArray(), email = newuser.Email, pass = newuser.Password, salt = "asssdd" });
-                var xd = con.Query<User>("SELECT * FROM Users where Email = :Email", new { Email = email });
-                //OracleDataReader reader = cmd.ExecuteReader();
-                //Console.WriteLine(reader.GetString(0));
-                
-                Console.WriteLine("Press RETURN to exit.");
-                    //Console.ReadLine();
-                 return xd.SingleOrDefault();
+                    var user = con.Query<User>("SELECT * FROM Users where Email = :Email", new { Email = email });
+                    return user.SingleOrDefault();
                 }
             }
             catch (Exception ex)

@@ -35,6 +35,10 @@
                     <li><a asp-page="/Index">Home</a></li>
                     <li><a asp-page="/Articles/Add">Add article</a></li>
                     <li><a asp-page="/Articles">Browse</a></li>
+                    @if (HttpContextAccessor.HttpContext.User.IsInRole("Read"))
+                    {
+                        <li><a asp-page="/Suggestions/Index">Suggestions</a></li>
+                    }
                 </ul>
                 @await Html.PartialAsync("_LoginPartial")
             </div>
