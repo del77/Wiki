@@ -88,7 +88,7 @@ namespace Wiki.Infrastructure.Repositories
                     article.Category = category.Single();
 
 
-                    var textsQuery = $"Select Id, Title from Texts where ArticleID = :artid and Title like :tit";
+                    var textsQuery = $"Select Id, Title, Version from Texts where ArticleID = :artid and Title like :tit";
                     if (selectedStatus != 0)
                         textsQuery += $" and statusid={selectedStatus}";
 

@@ -20,9 +20,10 @@ namespace Wiki.Infrastructure.Services
             this.mapper = mapper;
             this.encrypter = encrypter;
         }
-        public Task<IEnumerable<UserDto>> BrowseAsync()
+        public async Task<IEnumerable<UserDto>> BrowseAsync()
         {
-            throw new NotImplementedException();
+            var users = await userRepository.GetAllAsync();
+            return mapper.Map<IEnumerable<UserDto>>(users);
         }
 
         public async Task<UserDto> GetAsync(string email)

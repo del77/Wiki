@@ -23,15 +23,20 @@ namespace Wiki.Infrastructure.Repositories
         {
             using (IDbConnection con = new OracleConnection(settings.ConnectionString))
             {
-                con.Open();
                 string sql = "INSERT INTO Users (email, password, salt) Values (:email, :password, :salt)";
                 var affectedRows = con.Execute(sql, new { email = user.Email, password = user.Password, salt = user.Salt });
                 //con.Query<User>("SELECT * FROM Users where Email = :email", new { Email = "user1@email.com" });
             }
         }
-        public Task<IEnumerable<User>> GetAllAsync()
+        public async Task<IEnumerable<User>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            using (IDbConnection con = new OracleConnection(settings.ConnectionString))
+            {
+                string sql = "SELECT * FROM Users";
+                var users = await con.QueryAsync<User>(sql);
+                return users;
+            }
+
         }
 
         public async Task<User> GetAsync(int id)

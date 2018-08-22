@@ -9,5 +9,6 @@ namespace Wiki.Web.ViewModels
     {
         public int Id { get; set; }
         public string Email { get; set; }
+        public bool Selected { get; set; }
     }
 }

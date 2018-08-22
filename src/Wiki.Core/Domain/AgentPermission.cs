@@ -2,11 +2,10 @@ using System;
 
 namespace Wiki.Core.Domain
 {
-    public class AgentPermission
+    public class UserPermission
     {
-        public int AgentId { get; protected set; }
-        public Permission Permission { get; protected set; }
+        public int Id { get; protected set; }
+        public int UserId { get; protected set; }
+        public string Permission { get; protected set; }
     }
-
-    public enum Permission { Modify, Accept, Publish, Write, Read };
 }

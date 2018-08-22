@@ -9,5 +9,12 @@ namespace Wiki.Web.ViewModels
     {
         public string Email { get; set; }
         public string Password { get; set; }
+        public List<Permission> Permissions { get; set; }
+    }
+
+    public class Permission
+    {
+        public int Id { get; set; }
+        public string PermissionName { get; set; }
     }
 }

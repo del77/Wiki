@@ -23,6 +23,8 @@ namespace Wiki.Web.Pages.Articles
         public ViewModels.Article Article { get; set; }
         [BindProperty]
         public string ContentComparision { get; set; }
+        [BindProperty]
+        public List<Article> OtherVersions { get; set; }
         public string TitleComparision { get; set; }
 
         [BindProperty]
@@ -52,41 +54,48 @@ namespace Wiki.Web.Pages.Articles
             }
             if (!httpContextAccessor.HttpContext.User.IsInRole("Read") && article.Master.Status.Id != 1)
                 return Page();
-            //Article = new ViewModels.Article
-            //{
-            //    ArticleId = article.Id,
-            //    TextId = article.Master.Id,
-            //    Version = article.Master.Version,
-            //    Comment = article.Master.TextComment,
-            //    Category = new ViewModels.CategoryFilter
-            //    {
-            //        Id = article.Category.Id,
-            //        Category = article.Category.Category
-            //    },
-            //    Content = article.Master.Content,
-            //    Status = new ViewModels.StatusFilter
-            //    {
-            //        Id = article.Master.Status.Id,
-            //        Status = article.Master.Status.Status
-            //    },
-            //    Title = article.Master.Title,
-            //    Author = new Author
-            //    {
-            //        Id = article.Master.Author.Id,
-            //        Email = article.Master.Author.Email
-            //    }
-            //};
-            //var tags = new List<TagFilter>();
-            //foreach (var tag in article.Master.Tags)
-            //{
-            //    tags.Add(new TagFilter
-            //    {
-            //        Id = tag.Id,
-            //        Tag = tag.Tag
-            //    });
-            //}
-            //Article.Tags = tags;
+
+
             Article = CreateArticle(article);
+
+            var otherVersions = await articleService.BrowseAsync(null, new int[] { }, 0, 0, article.Id);
+            OtherVersions = new List<ViewModels.Article>();
+            foreach (var item in otherVersions)
+            {
+                foreach (var text in item.Texts)
+                {
+                    var art = new Article();
+                    art.Title = text.Title;
+                    art.Category = new CategoryFilter
+                    {
+                        Id = item.Category.Id,
+                        Category = item.Category.Category
+                    };
+                    var tags = new List<TagFilter>();
+                    foreach (var tag in text.Tags)
+                    {
+                        tags.Add(new TagFilter
+                        {
+                            Id = tag.Id,
+                            Tag = tag.Tag,
+                            Checked = true
+                        });
+                    }
+                    art.ArticleId = item.Id;
+                    art.TextId = text.Id;
+                    art.Tags = tags;
+                    art.Version = text.Version;
+                    art.Status = new StatusFilter
+                    {
+                        Id = text.Status.Id,
+                        Status = text.Status.Status,
+                        Selected = false
+                    };
+
+
+                    OtherVersions.Add(art);
+                }
+            }
             return Page();
         }
 

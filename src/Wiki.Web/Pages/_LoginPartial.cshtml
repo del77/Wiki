@@ -4,6 +4,10 @@
 {
     <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right">
+            @if(HttpContextAccessor.HttpContext.User.IsInRole("Admin"))
+            {
+                <li><a asp-page="/AdminPanel">Admin Panel</a></li>
+            }
             <li>
                 <label class="text-info">You are loged in as @HttpContextAccessor.HttpContext.User.Identity.Name</label>
 
