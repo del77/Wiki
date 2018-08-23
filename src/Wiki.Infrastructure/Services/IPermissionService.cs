@@ -8,6 +8,7 @@ namespace Wiki.Infrastructure.Services
 {
     public interface IPermissionService : IService
     {
-        Task<IEnumerable<UserDto>> BrowseAsync();
+        Task<IEnumerable<UserPermissionDto>> BrowseAsync();
+        Task<IEnumerable<UserPermissionDto>> GetUserPermissions(int userId);
     }
 }

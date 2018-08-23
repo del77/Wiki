@@ -9,6 +9,10 @@
 @{
     ViewData["Title"] = "About";
 }
+
+
+
+
 <h2>@ViewData["Title"]</h2>
 
 
@@ -51,9 +55,7 @@
 
 
 
-
-
-    <table class="table">
+    <table id="allArticles" class="display">
         <thead>
             <tr>
                 <th>
@@ -68,7 +70,7 @@
                         Status
                     </th>
                 }
-                <th></th>
+
             </tr>
         </thead>
         <tbody>
@@ -90,6 +92,17 @@
                 </tr>
             }
         </tbody>
-        
-
     </table>
+
+
+
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+    <script>
+        var jquery = jQuery.noConflict();
+        jquery(document).ready(function () {
+            jquery('#allArticles').dataTable();
+        });
+    </script>

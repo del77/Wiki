@@ -13,12 +13,14 @@ namespace Wiki.Infrastructure.Services
         private readonly IUserRepository userRepository;
         private readonly IMapper mapper;
         private readonly IEncrypter encrypter;
+        private readonly IUserPermissionRepository userPermissionRepository;
 
-        public UserService(IUserRepository userRepository, IMapper mapper, IEncrypter encrypter)
+        public UserService(IUserRepository userRepository, IMapper mapper, IEncrypter encrypter, IUserPermissionRepository userPermissionRepository)
         {
             this.userRepository = userRepository;
             this.mapper = mapper;
             this.encrypter = encrypter;
+            this.userPermissionRepository = userPermissionRepository;
         }
         public async Task<IEnumerable<UserDto>> BrowseAsync()
         {
@@ -36,6 +38,12 @@ namespace Wiki.Infrastructure.Services
         {
             var user = await userRepository.GetAsync(id);
             return mapper.Map<UserDto>(user);
+        }
+
+        public async Task<IEnumerable<UserPermissionDto>> GetPermissionsInfo()
+        {
+            var permissions = await userRepository.GetPermissions();
+            return mapper.Map<IEnumerable<UserPermissionDto>>(permissions);
         }
 
         public async Task LoginAsync(string email, string password)
@@ -60,6 +68,29 @@ namespace Wiki.Infrastructure.Services
             var hash = encrypter.GetHash(password, salt);
             //user = new User(1, email, hash, salt);
             await userRepository.AddAsync(user);
+        }
+
+        public async Task UpdatePermissions(int userId, IEnumerable<int> permissions)
+        {
+            var user = await userRepository.GetAsync(userId);
+            if (user == null)
+                throw new Exception("user doesn't exist");
+            var permissionsInfo = await userRepository.GetPermissions();
+            var tasks = new List<Task>();
+            foreach(var permission in permissionsInfo)
+            {
+                tasks.Add(userPermissionRepository.RemoveAsync(permission.Id, userId));
+                //await userPermissionRepository.RemoveAsync(permission.Id, userId);
+            }
+            await Task.WhenAll(tasks);
+            tasks.Clear();
+            foreach (var permission in permissions)
+            {
+                UserPermission up = new UserPermission(permission, userId);
+                tasks.Add(userPermissionRepository.AddAsync(up));
+            }
+            await Task.WhenAll(tasks);
+            //user.SetPermissions(new HashSet<UserPermission>(permissions));
         }
     }
 }

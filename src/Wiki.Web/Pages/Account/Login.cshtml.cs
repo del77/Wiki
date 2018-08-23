@@ -57,7 +57,7 @@ namespace Wiki.Web.Pages.Account
                     return Page();
                 }
                 var user = await userService.GetAsync(User_.Email);
-                var agent = await agentService.GetAsync(user.Id);
+                //var agent = await agentService.GetAsync(user.Id);
 
                 #region snippet1
                 var claims = new List<Claim>
@@ -67,13 +67,13 @@ namespace Wiki.Web.Pages.Account
                     //new Claim("FullName", user.FullName),
                 };
 
-                if (agent != null)
-                {
-                    foreach (var permission in agent.Permissions)
+                //if (agent != null)
+                //{
+                    foreach (var permission in user.Permissions)
                     {
-                        claims.Add(new Claim(ClaimTypes.Role, permission));
+                        claims.Add(new Claim(ClaimTypes.Role, permission.Permission));
                     }
-                }
+                //}
 
 
 

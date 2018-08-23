@@ -5,4 +5,23 @@
 }
 
 <h2>Edit</h2>
-
+<form method="post">
+    <table class="table-responsive">
+        <tr>
+            @{
+                foreach (var permission in Model.Permissions)
+                {
+                    @:<td>
+                        <input type="checkbox"
+                               name="selectedPermissions"
+                               value="@permission.Id"
+                               @(Html.Raw(permission.Checked ? "checked=\"checked\"" : "")) />
+                        @permission.PermissionName
+                    @:</td>
+                }
+            @:</tr>
+            }
+        </table>
+            <input type="hidden" value="@Model.User.Id" name="userId"/>
+            <input type="submit" value="Search" runat="server" class="btn btn-default" />
+</form>

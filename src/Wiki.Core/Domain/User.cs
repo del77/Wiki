@@ -29,6 +29,11 @@ namespace Wiki.Core.Domain
             
         }
 
+        public void SetPermissions(ISet<UserPermission> permissions)
+        {
+            Permissions = permissions;
+        }
+
         public User(int author)
         {
             Id = author;

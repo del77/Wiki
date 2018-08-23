@@ -43,8 +43,10 @@ namespace Wiki.Infrastructure.Repositories
         {
             using (IDbConnection con = new OracleConnection(settings.ConnectionString))
             {
-                var user = con.Query<User>("SELECT * FROM Users where id = :Id", new { Id = id });
-                return user.SingleOrDefault();
+                var user = (await con.QueryAsync<User>("SELECT * FROM Users where id = :Id", new { Id = id })).Single();
+                var permissions = await con.QueryAsync<UserPermission>("Select p.id, permission from permissions p, userpermissions up where p.id = permissionid and userid = :Userid", new { Userid = user.Id });
+                user.SetPermissions(new HashSet<UserPermission>(permissions));
+                return user;
             }
         }
 
@@ -57,8 +59,16 @@ namespace Wiki.Infrastructure.Repositories
         
                 using(IDbConnection con = new OracleConnection(settings.ConnectionString))
                 {
-                    var user = con.Query<User>("SELECT * FROM Users where Email = :Email", new { Email = email });
-                    return user.SingleOrDefault();
+                    var user = (await con.QueryAsync<User>("SELECT * FROM Users where Email = :Email", new { Email = email })).Single();
+                    //var permissions = await con.QueryAsync<int>("Select permissionid from userpermissions where userid = :Userid", new { Userid = id });
+                    var permissions = await con.QueryAsync<UserPermission>("Select p.id, permission from permissions p, userpermissions up where p.id = permissionid and userid = :Userid", new { Userid = user.Id });
+                    //var userPermissions = new HashSet<UserPermission>();
+                    //foreach(var permission in permissions)
+                    //{
+                    //    userPermissions.Add(new UserPermission(permission));
+                    //}
+                    user.SetPermissions(new HashSet<UserPermission>(permissions));
+                    return user;
                 }
             }
             catch (Exception ex)
@@ -66,6 +76,14 @@ namespace Wiki.Infrastructure.Repositories
                 Console.WriteLine("Error : {0}", ex);
             }
             return null;
+        }
+
+        public async Task<IEnumerable<UserPermission>> GetPermissions()
+        {
+            using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
+            {
+                return await connection.QueryAsync<UserPermission>("SELECT * from Permissions");
+            }
         }
 
         public Task RemoveAsync(int id)

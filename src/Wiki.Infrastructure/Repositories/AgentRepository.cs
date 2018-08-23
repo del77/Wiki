@@ -29,7 +29,7 @@ namespace Wiki.Infrastructure.Repositories
                 if (agent != null)
                 {
                     var permissions = con.Query<string>("Select PERMISSION From Agentspermissions a, permissions p where p.id = a.permissionid and a.agentid = :ID", new { ID = id });
-                    agent.Permissions = permissions;
+                    //agent.Permissions = permissions;
                 }
                 //OracleDataReader reader = cmd.ExecuteReader();
 

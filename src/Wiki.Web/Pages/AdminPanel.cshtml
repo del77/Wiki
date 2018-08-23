@@ -12,9 +12,13 @@
         <div class="container">
             
             <ul class="nav nav-pills nav-stacked">
-                <li><a href="#">Menu 1</a></li>
-                <li><a href="#">Menu 2</a></li>
-                <li><a href="#">Menu 3</a></li>
+                @foreach(var user in Model.Users)
+                {
+                <li><a asp-page="/Users/Edit" asp-route-userId="@user.Id">@Html.DisplayFor(model => user.Email)</a></li>
+
+
+                }
+
             </ul>
         </div>
 

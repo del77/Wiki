@@ -21,15 +21,17 @@ namespace Wiki.Web.Pages
         [BindProperty]
         public List<User> Users { get; set; }
 
+
         public async Task OnGet()
         {
             var users = await userService.BrowseAsync();
-            
+
             Users = new List<User>();
-            foreach(var user in users)
+            foreach (var user in users)
             {
                 Users.Add(new User
                 {
+                    Id = user.Id,
                     Email = user.Email
                 });
             }
