@@ -29,7 +29,8 @@
     "test-infra"
   ],
   "dependencies": {
-    "jquery": "1.9.1 - 3"
+    "jquery": "1.9.1 - 3",
+    "bootstrap3-typeahead": "git://github.com/bassjobsen/Bootstrap-3-Typeahead.git#master"
   },
   "version": "3.3.7",
   "_release": "3.3.7",

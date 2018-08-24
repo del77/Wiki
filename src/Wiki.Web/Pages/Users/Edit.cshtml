@@ -6,22 +6,28 @@
 
 <h2>Edit</h2>
 <form method="post">
-    <table class="table-responsive">
-        <tr>
+    <div class="row">
+        <div class="table-bordered col-md-3" style="float: right">
             @{
+                    <b>Permissions</b><br/>
                 foreach (var permission in Model.Permissions)
                 {
-                    @:<td>
-                        <input type="checkbox"
-                               name="selectedPermissions"
-                               value="@permission.Id"
-                               @(Html.Raw(permission.Checked ? "checked=\"checked\"" : "")) />
-                        @permission.PermissionName
-                    @:</td>
+                    <input type="checkbox"
+                           name="selectedPermissions"
+                           value="@permission.Id"
+                           @(Html.Raw(permission.Checked ? "checked=\"checked\"" : "")) />
+                    @permission.PermissionName
+                    <br />
+
                 }
-            @:</tr>
+
             }
-        </table>
+        </div>
+        <div class="col-md-9 table-bordered" style="float:left">
+            @Html.LabelFor(model => model.User.Email)
+            @Html.EditorFor(model => model.User.Email)
+        </div>
+    </div>
             <input type="hidden" value="@Model.User.Id" name="userId"/>
-            <input type="submit" value="Search" runat="server" class="btn btn-default" />
+            <input type="submit" value="Save" runat="server" class="btn btn-default" />
 </form>

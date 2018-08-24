@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 using Wiki.Infrastructure.DTO;
 using Wiki.Infrastructure.Services;
 using Wiki.Web.ViewModels;
@@ -18,7 +19,11 @@ namespace Wiki.Web.Pages
     {
         private readonly IArticleService articleService;
         private readonly IHttpContextAccessor httpContextAccessor;
-
+        [BindProperty]
+        public IEnumerable<string> Test { get; set; } = new List<string>() { "cat1", "cat2", "cat3", "Waiting" };
+        [BindProperty]
+        public string json { get; set; } 
+        
         public List<ViewModels.Article> Articles { get; set; }
         [BindProperty]
         public StaticPagedList<ViewModels.Article> ArticlesPaged { get; set; }
@@ -29,6 +34,7 @@ namespace Wiki.Web.Pages
 
         public ArticlesModel(IArticleService articleService, IHttpContextAccessor httpContextAccessor)
         {
+            
             //this.commandDispatcher = commandDispatcher;    
             this.articleService = articleService;
             this.httpContextAccessor = httpContextAccessor;
@@ -49,6 +55,7 @@ namespace Wiki.Web.Pages
             var res2 = (await articleService.BrowseAsync(title, selectedTags, selectedCategory, selectedStatus)).ToPagedList(1, 5);
 
             Articles = new List<ViewModels.Article>();
+            
             foreach (var item in res)
             {
                 foreach (var text in item.Texts)
@@ -91,6 +98,9 @@ namespace Wiki.Web.Pages
         private async void SetupFilter(string title, IEnumerable<int> selectedTags, int selectedCategory)
         {
             var filter = await articleService.GetFilterInfo();
+            //json = JsonConvert.SerializeObject(filter.Categories.Select(x => x.Category));
+            json = JsonConvert.SerializeObject(Test);
+            
             var categories = new List<CategoryFilter>();
             categories.Add(new CategoryFilter
             {
