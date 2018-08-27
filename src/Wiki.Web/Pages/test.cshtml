@@ -8,10 +8,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 <script>
     var jquery = jQuery.noConflict();
-    $(document).ready(function() {
+    jquery(document).ready(function() {
         jquery('.js-example-basic-multiple').select2();
     });
 </script>
+
 <select class="js-example-basic-multiple" name="states[]" multiple="multiple">
     <option value="AL">Alabama</option>
     ...

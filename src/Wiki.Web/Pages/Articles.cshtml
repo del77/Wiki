@@ -33,7 +33,7 @@
         <table class="table-responsive">
             <tr>
                 @{
-                    foreach (var tag in Model.Filter.Tags)
+                    foreach (var tag in Model.Filter.Tags2)
                     {
                         @:<td>
                             <input type="checkbox"
@@ -66,8 +66,11 @@
                 </th>
                 @if (Model.CanRead)
                 {
-                    <th>
+                    <th style="position: relative">
                         Status
+                    </th>
+                    <th style="position: relative">
+                        User
                     </th>
                 }
 
@@ -76,20 +79,23 @@
         <tbody>
             @foreach (var item in Model.Articles)
             {
-                <tr>
+            <tr>
+                <td>
+                    <a asp-page="/Articles/Get" asp-route-articleid="@item.ArticleId" asp-route-textid="@item.TextId">@Html.DisplayFor(modelItem => item.Title)</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.Category)
+                </td>
+                @if (Model.CanRead)
+                {
                     <td>
-                        <a asp-page="/Articles/Get" asp-route-articleid="@item.ArticleId" asp-route-textid="@item.TextId">@Html.DisplayFor(modelItem => item.Title)</a>
+                        @Html.DisplayFor(modelItem => item.Status.Status)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Category.Category)
+                        @Html.DisplayFor(modelItem => item.Author.Email)
                     </td>
-                    @if (Model.CanRead)
-                    {
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Status.Status)
-                        </td>
-                    }
-                </tr>
+                }
+            </tr>
             }
         </tbody>
     </table>
@@ -160,6 +166,24 @@
                         .typeahead({
                                 source: function (query, process) {
                                     return process(@Html.Raw(Model.BrowseFilter.Categories));
+                            },
+                            showHintOnFocus: "true"
+                        }
+                    );
+
+                    jquery('input[class=2]', api.table().container())
+                        .typeahead({
+                                source: function (query, process) {
+                                    return process(@Html.Raw(Model.BrowseFilter.Statuses));
+                            },
+                            showHintOnFocus: "true"
+                        }
+                    );
+
+                    jquery('input[class=3]', api.table().container())
+                        .typeahead({
+                                source: function (query, process) {
+                                    return process(@Html.Raw(Model.BrowseFilter.Users));
                             },
                             showHintOnFocus: "true"
                         }

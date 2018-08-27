@@ -10,9 +10,11 @@ namespace Wiki.Web.ViewModels
     {
         public string Title { get; set; }
         public SelectList Categories { get; set; }
+        public SelectList Tags { get; set; }
+        public SelectList Users { get; set; }
         public string SelectedCategory { get; set; }
         public IEnumerable<int> SelectedTags { get; set; }  
-        public List<TagFilter> Tags { get; set; }
+        public List<TagFilter> Tags2 { get; set; }
         public SelectList Statuses { get; set; }
     }
 

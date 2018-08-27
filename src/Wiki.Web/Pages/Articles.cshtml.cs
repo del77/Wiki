@@ -18,11 +18,9 @@ namespace Wiki.Web.Pages
     public class ArticlesModel : PageModel
     {
         private readonly IArticleService articleService;
+        private readonly IUserService userService;
         private readonly IHttpContextAccessor httpContextAccessor;
-        [BindProperty]
-        public IEnumerable<string> Test { get; set; } = new List<string>() { "cat1", "cat2", "cat3", "Waiting" };
-        [BindProperty]
-        public string json { get; set; } 
+
         
         public List<ViewModels.Article> Articles { get; set; }
         [BindProperty]
@@ -32,99 +30,105 @@ namespace Wiki.Web.Pages
         public Filter Filter { get; set; }
         [BindProperty]
         public BrowseFilter BrowseFilter { get; set; }
-        public bool CanRead { get; set; }
+        
 
-        public ArticlesModel(IArticleService articleService, IHttpContextAccessor httpContextAccessor)
+        public bool CanRead { get; set; }
+        private readonly int userId;
+
+        public ArticlesModel(IArticleService articleService, IUserService userService, IHttpContextAccessor httpContextAccessor)
         {
             
             //this.commandDispatcher = commandDispatcher;    
             this.articleService = articleService;
+            this.userService = userService;
             this.httpContextAccessor = httpContextAccessor;
             CanRead = httpContextAccessor.HttpContext.User.IsInRole("Read");
+            var claims = (httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"));
+            if (claims != null)
+                userId = Convert.ToInt32(claims.Value);
         }
 
 
-        public async Task<IActionResult> OnGetAsync(string title, IEnumerable<int> selectedTags, int selectedCategory, int selectedStatus)
+        public async Task<IActionResult> OnGetAsync(int mine)
         {
-            //SetupFilter(title, selectedTags, selectedCategory);
+            SetupFilter();
+            int? selectedStatus = null;
+            int? selectedUser = null;
             Filter = new Filter
             {
-                Categories = new SelectList(new int[] {}),
+                Categories = new SelectList(new int[] { }),
                 SelectedTags = new List<int>(),
-                Statuses = new SelectList(new int[] {}),
-                Tags = new List<TagFilter>()
+                Statuses = new SelectList(new int[] { }),
+                Tags2 = new List<TagFilter>()
 
             };
-            json = JsonConvert.SerializeObject(Test);
-            BrowseFilter = new BrowseFilter();
-            BrowseFilter.Categories = JsonConvert.SerializeObject(new List<string>() { "cat1", "cat2", "cat3" });
-            BrowseFilter.Titles = JsonConvert.SerializeObject(new List<string>() { "article1", "article2", "article3" });
-
-            if (!CanRead && selectedStatus != 0)
-            {
-                return Page();
-            }
+            
             if (!CanRead)
                 selectedStatus = 1;
-            //var res = await articleService.BrowseAsync(title, selectedTags, selectedCategory, selectedStatus);
+            if (mine == 1)
+            {
+                selectedUser = userId;
+                CanRead = true;
+            }
+            var res = await articleService.BrowseAsync(selectedStatus, selectedUser, null);
             //var res2 = (await articleService.BrowseAsync(title, selectedTags, selectedCategory, selectedStatus)).ToPagedList(1, 5);
 
             Articles = new List<ViewModels.Article>();
             
-            List<ArticleDto> test = new List<ArticleDto>();
-            var a1 = new ArticleDto();
-            a1.Category = new ArticleCategoryDto
-            {
-                Category = "cat1",
-                Id = 1
-            };
-            var t1 = new TextDetailsDto
-            {
-                Status = new TextStatusDto
-                {
-                    Id = 1,
-                    Status = "stat1"
-                },
-                Title = "article1"
-            };
-            var tags1 = new List<TextTagDto>();
-            tags1.Add(new TextTagDto
-            {
-                Id = 1,
-                Tag = "tag1"
-            });
-            t1.Tags = tags1;
-            a1.Master = t1;
-            a1.Texts = new List<TextDto>() {t1};
+            //List<ArticleDto> test = new List<ArticleDto>();
+            //var a1 = new ArticleDto();
+            //a1.Category = new ArticleCategoryDto
+            //{
+            //    Category = "cat1",
+            //    Id = 1
+            //};
+            //var t1 = new TextDetailsDto
+            //{
+            //    Status = new TextStatusDto
+            //    {
+            //        Id = 1,
+            //        Status = "stat1"
+            //    },
+            //    Title = "article1"
+            //};
+            //var tags1 = new List<TextTagDto>();
+            //tags1.Add(new TextTagDto
+            //{
+            //    Id = 1,
+            //    Tag = "tag1"
+            //});
+            //t1.Tags = tags1;
+            //a1.Master = t1;
+            //a1.Texts = new List<TextDto>() {t1};
 
-            var a2 = new ArticleDto();
-            a2.Category = new ArticleCategoryDto
-            {
-                Category = "cat2",
-                Id = 2
-            };
-            var t2 = new TextDetailsDto
-            {
-                Status = new TextStatusDto
-                {
-                    Id = 2,
-                    Status = "stat2"
-                },
-                Title = "article2"
-            };
-            var tags2 = new List<TextTagDto>();
-            tags2.Add(new TextTagDto
-            {
-                Id = 2,
-                Tag = "tag2"
-            });
-            t2.Tags = tags2;
-            a2.Master = t2;
-            a2.Texts = new List<TextDto>() { t2 };
+            //var a2 = new ArticleDto();
+            //a2.Category = new ArticleCategoryDto
+            //{
+            //    Category = "cat2",
+            //    Id = 2
+            //};
+            //var t2 = new TextDetailsDto
+            //{
+            //    Status = new TextStatusDto
+            //    {
+            //        Id = 2,
+            //        Status = "stat2"
+            //    },
+            //    Title = "article2"
+            //};
+            //var tags2 = new List<TextTagDto>();
+            //tags2.Add(new TextTagDto
+            //{
+            //    Id = 2,
+            //    Tag = "tag2"
+            //});
+            //t2.Tags = tags2;
+            //a2.Master = t2;
+            //a2.Texts = new List<TextDto>() { t2 };
 
-            test.Add(a1);
-            test.Add(a2);
-            var res = test;
+            //test.Add(a1);
+            //test.Add(a2);
+            //var res = test;
 
             foreach (var item in res)
             {
@@ -156,20 +160,32 @@ namespace Wiki.Web.Pages
                         Status = text.Status.Status,
                         Selected = false
                     };
-                        
+                    article.Author = new Author
+                    {
+                        Id = text.Author.Id,
+                        Email = text.Author.Email
+                    };
 
                     Articles.Add(article);
                 }
             }
+
+            BrowseFilter.Titles = JsonConvert.SerializeObject(Articles.Select(x => x.Title));
+            //BrowseFilter.Users = JsonConvert.SerializeObject(res.SelectMany(x => x.Texts).Select(y => y.Author.Email).Distinct());\
+            BrowseFilter.Users = JsonConvert.SerializeObject(Articles.Select(x => x.Author.Email).Distinct());
+
+
             ArticlesPaged = new StaticPagedList<Article>(Articles, 1, 4, Articles.Count());
             return Page();
         }
-
-        private async void SetupFilter(string title, IEnumerable<int> selectedTags, int selectedCategory)
+        
+        private async void SetupFilter()
         {
             var filter = await articleService.GetFilterInfo();
-            //json = JsonConvert.SerializeObject(filter.Categories.Select(x => x.Category));
-            json = JsonConvert.SerializeObject(Test);
+            BrowseFilter = new BrowseFilter();
+            BrowseFilter.Categories = JsonConvert.SerializeObject(filter.Categories.Select(x => x.Category));
+            BrowseFilter.Statuses = JsonConvert.SerializeObject(filter.Statuses.Select(x => x.Status));
+
             
             var categories = new List<CategoryFilter>();
             categories.Add(new CategoryFilter
@@ -205,31 +221,31 @@ namespace Wiki.Web.Pages
                 });
             }
 
-            Filter = new Filter
-            {
-                Title = title,
-                Categories = new SelectList(categories, "Id", "Category"),
-                Statuses = new SelectList(statuses, "Id", "Status")
-            };
+            //Filter = new Filter
+            //{
+            //    Title = title,
+            //    Categories = new SelectList(categories, "Id", "Category"),
+            //    Statuses = new SelectList(statuses, "Id", "Status")
+            //};
 
-            Filter.Tags = new List<TagFilter>();
-            foreach (var tag in filter.Tags)
-            {
-                Filter.Tags.Add(new TagFilter
-                {
-                    Id = tag.Id,
-                    Tag = tag.Tag,
-                    Checked = false
-                });
-            }
-            if (selectedCategory != 0)
-            {
-                Filter.Categories.Where(x => x.Value == selectedCategory.ToString()).Single().Selected = true;
-            }
-            foreach(var tag in selectedTags)
-            {
-                Filter.Tags.Where(x => x.Id == tag).Single().Checked = true;
-            }
+            //Filter.Tags2 = new List<TagFilter>();
+            //foreach (var tag in filter.Tags)
+            //{
+            //    Filter.Tags2.Add(new TagFilter
+            //    {
+            //        Id = tag.Id,
+            //        Tag = tag.Tag,
+            //        Checked = false
+            //    });
+            //}
+            //if (selectedCategory != 0)
+            //{
+            //    Filter.Categories.Where(x => x.Value == selectedCategory.ToString()).Single().Selected = true;
+            //}
+            //foreach(var tag in selectedTags)
+            //{
+            //    Filter.Tags2.Where(x => x.Id == tag).Single().Checked = true;
+            //}
         }
     }
 }

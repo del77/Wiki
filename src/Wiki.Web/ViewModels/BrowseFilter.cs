@@ -10,5 +10,6 @@ namespace Wiki.Web.ViewModels
         public string Titles { get; set; }
         public string Categories { get; set; }
         public string Statuses { get; set; }
+        public string Users { get; set; }
     }
 }

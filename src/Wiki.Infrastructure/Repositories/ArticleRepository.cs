@@ -66,15 +66,10 @@ namespace Wiki.Infrastructure.Repositories
             }
         }
 
-        public async Task<IEnumerable<Article>> GetAllAsync(IEnumerable<int> selectedTags, string title, int selectedCategory, int selectedStatus, int selectedArticle)
+        public async Task<IEnumerable<Article>> GetAllAsync(int? selectedStatus, int? selectedUser, int? selectedArticle)
         {
-            if (title == null)
-                title = "";
-
             var articleQuery = "SELECT a.ID FROM Articles a";
-            if (selectedCategory != 0)
-                articleQuery += $" where categoryid={selectedCategory}";
-            else if(selectedArticle != 0)
+            if(selectedArticle != null)
                 articleQuery += $" where a.ID={selectedArticle}";
 
             using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
@@ -87,45 +82,34 @@ namespace Wiki.Infrastructure.Repositories
                     var category = await connection.QueryAsync<ArticleCategory>("Select * From Categories where ID = (Select categoryid from articles where id = :artid)", new { artid = article.Id });
                     article.Category = category.Single();
 
-
-                    var textsQuery = $"Select Id, Title, Version from Texts where ArticleID = :artid and Title like :tit";
-                    if (selectedStatus != 0)
+                    var textsQuery = $"Select Id, Title, Version from Texts where ArticleID = :artid";
+                    if (selectedStatus != null)
                         textsQuery += $" and statusid={selectedStatus}";
+                    if(selectedUser!=null)
+                        textsQuery += $" and authorid={selectedUser}";
 
-                    var tagsCount = selectedTags.Count();
-                    if (tagsCount > 0)
-                    {
-                        StringBuilder tagsString = new StringBuilder();
-                        for (int i = 0; i < tagsCount; i++)
-                        {
-                            tagsString.Append(selectedTags.ElementAt(i));
-                            if (i != tagsCount - 1)
-                                tagsString.Append(", ");
-                        }
-                        textsQuery += $" and Id in (Select textid from textstags where tagid in ({tagsString}) group by textid having count(tagid) = {tagsCount})";
-                    }
+                   
+                    
                     //var textsQuery = "Select t.Id, Title from Texts t, Statuses s where t.statusid = s.id and ArticleID = :artid and t.Title like :tit";
                     
-                    var texts = connection.Query<Text>(textsQuery, new { artid = article.Id, tit = "%" + title + "%" });
+                    var texts = connection.Query<Text>(textsQuery, new { artid = article.Id });
 
                     var tagsQuery = "Select * from textstags tt, tags t where t.ID = tt.TAGID and textid = :txid";
                     foreach (var text in texts)
                     {
                         var status = (await connection.QueryAsync<TextStatus>($"Select * from Statuses s where id = (Select statusid from texts where id={text.Id})")).Single();
                         var tags = await connection.QueryAsync<TextTag>(tagsQuery, new { txid = text.Id });
+                        var userQuery = $"Select id, email from Users where id = (Select authorid from texts where id = {text.Id})";
+                        var user = (await connection.QueryAsync<User>(userQuery)).Single();
+                        text.Author = user;
                         text.Tags = tags;
                         text.Status = status;
                     }
                     article.Texts = texts;
                     article.Master = article.Texts.Where(x => x.Status.Status == "Master").SingleOrDefault();
                 }
-                //var xd = connection.Query<Article>("SELECT ID, Title, Category FROM Articles where Id = :id2", new { id2 = id });
-                //OracleDataReader reader = cmd.ExecuteReader();
-                //Console.WriteLine(reader.GetString(0));
 
-                //return xd.SingleOrDefault();
                 return articles;
-                //Console.ReadLine();
             }
         }
 
@@ -191,7 +175,11 @@ namespace Wiki.Infrastructure.Repositories
 
         public async Task UpdateAsync(Article article)
         {
-            throw new NotImplementedException();
+            using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
+            {
+                string query = $"Update texts set articleid={article.Id}, authorid={article.Master.Author.Id}, statusid={article.Master.Status}, content={article.Master.Content}, title={article.Master.Title}, version={article.Master.Version}, textcomment={article.Master.TextComment}, createdate={article.Master.CreatedAt} where id={article.Master.Id}";
+                await connection.QueryAsync(query);
+            }
         }
 
         public async Task UpdateAsync(int textid, int status, string comment="")

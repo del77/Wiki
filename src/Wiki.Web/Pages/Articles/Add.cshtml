@@ -7,77 +7,78 @@
 
 <html>
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <meta name="viewport" content="width=device-width" />
     <title>TinyMCE Example</title>
     <!-- TinyMCE Script Reference -->
-    <script src="~/js/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript" src="/js/tinymce/tinymce.min.js"></script>
     <!-- Script to wire up your TinyMCE editor -->
-    <script type="text/javascript">
-        // Initialize your tinyMCE Editor with your preferred options
-        tinyMCE.init({
-            // General options
-            mode: "textareas",
+    <script>
+        tinymce.init({
+            selector: "textarea#elm1",
             theme: "modern",
-            // Theme options
-            theme_advanced_buttons1:
-                "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
-            theme_advanced_buttons2:
-                "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
-            theme_advanced_buttons3:
-                "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
-            theme_advanced_buttons4:
-                "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage",
-            theme_advanced_toolbar_location: "top",
-            theme_advanced_toolbar_align: "left",
-            theme_advanced_statusbar_location: "bottom",
-            theme_advanced_resizing: true,
-
-            // Example content CSS (should be your site CSS)
-            content_css: "css/example.css",
+            width: 'auto',
+            height: 300,
+            plugins: [
+                "advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker",
+                "searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
+                "save table contextmenu directionality emoticons template paste textcolor"
+            ],
+            content_css: "css/content.css",
+            toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons",
+            style_formats: [
+                { title: 'Bold text', inline: 'b' },
+                { title: 'Red text', inline: 'span', styles: { color: '#ff0000' } },
+                { title: 'Red header', block: 'h1', styles: { color: '#ff0000' } },
+                { title: 'Example 1', inline: 'span', classes: 'example1' },
+                { title: 'Example 2', inline: 'span', classes: 'example2' },
+                { title: 'Table styles' },
+                { title: 'Table row 1', selector: 'tr', classes: 'tablerow1' }
+            ]
         });
     </script>
 </head>
 <body>
     <div asp-validation-summary="All"></div>
     <form asp-page="./Articles/Add" method="post">
-
         <div class="form-actions no-color">
+            <script>
+                var jquery = jQuery.noConflict();
+                jquery(document).ready(function () {
+                    jquery('.js-example-basic-multiple').select2({
+                        placeholder: "Select Tags...",
+                        allowClear: false
+                    });
+                    jquery('.js-example-basic-single').select2({
+                        placeholder: "Select Category...",
+                        allowClear: false
+                    });
 
-            @if (!Model.Editing)
-            {
-                <label>Category</label>
-                <select asp-items="@Model.Filter.Categories" asp-for="Article.Category.Id"></select>
-            }
-            else
-            {         
-                <input type="hidden" asp-for="Article.TextId" />
-            }
-            <table>
-                <tr>
-                    @{
-                        foreach (var tag in Model.Filter.Tags)
-                        {
-                            @:<td>
-                                <input type="checkbox"
-                                       value="@tag.Id"
-                                       name="selectedTags"
-                                       @(Html.Raw(tag.Checked ? "checked=\"checked\"" : "")) />
-                                @tag.Tag
-                            @:</td>
-                        }
-                    @:</tr>
-                    }
-                </table>
+                });
+            </script>
 
-                Title: <input asp-for="Article.Title" />
-                <span asp-validation-for="@Model.Article.Title" class="text-danger" />
-
-                @Html.TextAreaFor(model => model.Article.Content)
-                <button type="submit" onclick="SaveTags">abc</button>
-                <input type="submit" value="Add" runat="server" class="btn btn-default" />
-
-
+            <b>Title: </b><input asp-for="Article.Title" />
+            <span asp-validation-for="@Model.Article.Title" class="text-danger" />
+            <textarea asp-for="Article.Content" id="elm1"></textarea>
+            
+            <div class="row">
+                @if (!Model.Editing || Model.Article.Status.Status == "NotSubmitted")
+                {
+                    <select asp-items="@Model.Filter.Categories" asp-for="Article.Category.Id" class="js-example-basic-single" style="width:50%"><option></option></select>
+                }
+                else
+                {
+                    <input type="hidden" asp-for="Article.TextId" />
+                }
+                <select asp-items="@Model.Filter.Tags" asp-for="Article.Comment" name="selectedTags" class="js-example-basic-multiple" multiple="multiple" style="float:right; width:49%"></select>
             </div>
+            <input type="submit" value="Save" asp-route-submit="0" class="btn btn-default" />
+            <input type="submit" value="Publish" asp-route-submit="1" class="btn btn-default" />
+
+
+        </div>
 </form>
 </body>
 </html>

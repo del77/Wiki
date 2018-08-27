@@ -41,7 +41,7 @@ namespace Wiki.Web.Pages.Articles
         public async Task<IActionResult> OnGetAsync(int articleid, int textid)
         {
             var article = await articleService.GetAsync(textid);
-            var masterForArticle = (await articleService.BrowseAsync(null, new int[0], 0, 1)).Where(x => x.Id == article.Id).SingleOrDefault();
+            var masterForArticle = (await articleService.BrowseAsync(1, null, article.Id)).SingleOrDefault();
             ArticleDetailsDto masterForArticleDetails;
             if (masterForArticle.Master != null)
             {
@@ -58,7 +58,7 @@ namespace Wiki.Web.Pages.Articles
 
             Article = CreateArticle(article);
 
-            var otherVersions = await articleService.BrowseAsync(null, new int[] { }, 0, 0, article.Id);
+            var otherVersions = await articleService.BrowseAsync(null, null, article.Id);
             OtherVersions = new List<ViewModels.Article>();
             foreach (var item in otherVersions)
             {

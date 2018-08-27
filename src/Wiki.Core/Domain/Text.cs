@@ -23,6 +23,15 @@ namespace Wiki.Core.Domain
             CreatedAt = DateTime.Now;
         }
 
+        public Text(int id, string title, string content, double version) : base()
+        {
+            Id = id;
+            CreatedAt = DateTime.Now;
+            Title = title;
+            Content = content;
+            Version = version;
+        }
+
         protected Text()
         {
 
@@ -67,6 +76,11 @@ namespace Wiki.Core.Domain
 
         // public Status Status { get; protected set; }
         public TextStatus Status { get;  set; }
+
+        public void SetComment(string textcomment)
+        {
+            TextComment = textcomment;
+        }
     }
 
 }

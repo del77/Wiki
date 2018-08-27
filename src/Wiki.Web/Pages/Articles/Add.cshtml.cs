@@ -66,16 +66,16 @@ namespace Wiki.Web.Pages.Articles
                     }
                 };
                 var tags = new List<TagFilter>();
-                foreach (var tag in article.Master.Tags)
-                {
-                    tags.Add(new TagFilter
-                    {
-                        Id = tag.Id,
-                        Tag = tag.Tag,
-                        Checked = true
-                    });
-                    Filter.Tags.Where(x => x.Id == tag.Id).Single().Checked = true;
-                }
+                //foreach (var tag in article.Master.Tags)
+                //{
+                //    tags.Add(new TagFilter
+                //    {
+                //        Id = tag.Id,
+                //        Tag = tag.Tag,
+                //        Checked = true
+                //    });
+                //    Filter.Tags2.Where(x => x.Id == tag.Id).Single().Checked = true;
+                //}
                 Article.Tags = tags;
                 Article.Content = article.Master.Content;
                 Article.Title = article.Master.Title;
@@ -88,17 +88,17 @@ namespace Wiki.Web.Pages.Articles
             return Page();
         }
 
-        public async Task OnPostAsync(int[] selectedTags, Article Article = null)
+        public async Task OnPostAsync(int[] selectedTags, int submit, Article Article = null)
         {
             if (ModelState.IsValid)
             {
                 if (Article.TextId != 0)
                 {
-                    
                     var editedArticle = await articleService.GetAsync(Article.TextId);
-                    var master = (await articleService.BrowseAsync(null, new int[0], 0, 1)).Where(x => x.Id == editedArticle.Id).SingleOrDefault();
+                    //var master = (await articleService.BrowseAsync(1, null, null)).Where(x => x.Id == editedArticle.Id).SingleOrDefault();
+                    var master = (await articleService.BrowseAsync(1, null, editedArticle.Id)).SingleOrDefault();
                     var masterDetails = await articleService.GetAsync(master.Master.Id);
-
+                    Article.Comment = editedArticle.Master.TextComment;
                     Article.Version = masterDetails.Master.Version + 0.1;
                     Article.Category = new CategoryFilter
                     {
@@ -107,8 +107,17 @@ namespace Wiki.Web.Pages.Articles
                 }
                 else
                     Article.Version = 1.0;
-
-                await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, selectedTags, Article.Category.Id, userId, Article.Version);
+                if (submit == 0)
+                    await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version);
+                else if (submit == 1)
+                {
+                    if(Article.TextId != 0)
+                    {
+                        await articleService.UpdateVersion(Article.ArticleId, Article.TextId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, Article.Comment);
+                    }
+                    else
+                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version);
+                }
             }
             
             await SetupFilter(selectedTags);
@@ -139,22 +148,23 @@ namespace Wiki.Web.Pages.Articles
                 //Title = title,
                 Categories = new SelectList(categories, "Id", "Category"),
             };
+            var tags = new List<SelectListItem>();
 
-            Filter.Tags = new List<TagFilter>();
+            //Filter.Tags2 = new List<TagFilter>();
             foreach (var tag in filter.Tags)
             {
-                Filter.Tags.Add(new TagFilter
+                tags.Add(new SelectListItem
                 {
-                    Id = tag.Id,
-                    Tag = tag.Tag,
-                    Checked = false
+                    Text = tag.Tag,
+                    Value = tag.Id.ToString(),
+                    Selected = false
                 });
             }
-
-            foreach(var tag in selectedTags)
-            {
-                Filter.Tags.Single(x => x.Id == tag).Checked = true;
-            }
+            Filter.Tags = new SelectList(tags, "Value", "Text");
+            //foreach (var tag in selectedTags)
+            //{
+            //    Filter.Tags2.Single(x => x.Id == tag).Checked = true;
+            //}
 
             //if (selectedCategory != 0)
             //{
@@ -167,10 +177,6 @@ namespace Wiki.Web.Pages.Articles
             
 
 
-        }
-        protected void SaveTags(object sender, EventArgs e)
-        {
-            Article.Tags = new List<TagFilter>(Filter.Tags.Where(x => x.Checked == true));
         }
     }
 }

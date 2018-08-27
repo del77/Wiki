@@ -30,7 +30,7 @@ namespace Wiki.Web.Pages.Articles
             if(status == 1 && user.IsInRole("Publish"))
             {
                 var article = await articleService.GetAsync(textid);
-                var masterForArticle = (await articleService.BrowseAsync(null, new int[0], 0, 1)).Where(x => x.Id == article.Id).SingleOrDefault();
+                var masterForArticle = (await articleService.BrowseAsync(1, null, article.Id)).SingleOrDefault();
                 var tasks = new List<Task>();
                 
                 tasks.Add(Task.Factory.StartNew(() => articleService.ChangeStatus(textid, status)));

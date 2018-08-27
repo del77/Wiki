@@ -23,9 +23,9 @@ namespace Wiki.Infrastructure.Services
 
 
 
-        public async Task<IEnumerable<ArticleDto>> BrowseAsync(string title, IEnumerable<int> selectedTags, int selectedCategory, int selectedStatus, int selectedArticle=0)
+        public async Task<IEnumerable<ArticleDto>> BrowseAsync(int? selectedStatus, int? selectedUser, int? selectedArticle)
         {
-            var articles = await articleRepository.GetAllAsync(selectedTags, title, selectedCategory, selectedStatus, selectedArticle);
+            var articles = await articleRepository.GetAllAsync(selectedStatus, selectedUser, selectedArticle);
             return mapper.Map<IEnumerable<ArticleDto>>(articles);
         }
 
@@ -48,9 +48,8 @@ namespace Wiki.Infrastructure.Services
             return filter;
         }
 
-        public async Task AddAsync(int articleId, string title, string content, int[] selectedTags, int selectedCategory, int author, double version)
+        public async Task AddAsync(int articleId, string title, string content, int status, int[] selectedTags, int selectedCategory, int author, double version)
         {
-            author = 0;
             var article = new Article(articleId);
 
             var tags = new List<TextTag>();
@@ -62,8 +61,8 @@ namespace Wiki.Infrastructure.Services
             var user = new User(author);
 
             var text = new Text(title, content, version);
-            var status = new TextStatus(2); // waiting
-            text.SetStatus(status);
+            var textStatus = new TextStatus(status);
+            text.SetStatus(textStatus);
             text.SetTags(tags);
             text.SetAuthor(user);
             article.SetText(text);
@@ -78,6 +77,33 @@ namespace Wiki.Infrastructure.Services
         public async Task ChangeStatus(int textid, int status, string comment="")
         {
             await articleRepository.UpdateAsync(textid, status, comment);
+        }
+
+        public async Task UpdateVersion(int articleId, int textId, string title, string content, int status, int[] selectedTags, int selectedCategory, int author, double version, string textcomment)
+        {
+            var article = new Article(articleId);
+
+            var tags = new List<TextTag>();
+            foreach (var tag in selectedTags)
+            {
+                tags.Add(new TextTag(tag));
+            }
+
+            var user = new User(author);
+
+            var text = new Text(textId, title, content, version);
+            var textStatus = new TextStatus(status);
+            text.SetStatus(textStatus);
+            text.SetTags(tags);
+            text.SetAuthor(user);
+            text.SetComment(textcomment);
+            article.SetText(text);
+
+            var category = new ArticleCategory(selectedCategory);
+            article.SetCategory(category);
+
+
+            await articleRepository.UpdateAsync(article);
         }
     }
 }

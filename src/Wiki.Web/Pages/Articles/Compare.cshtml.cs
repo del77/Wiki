@@ -28,7 +28,7 @@ namespace Wiki.Web.Pages.Articles
         public async Task OnGet(int articleid, int textid)
         {
             var article1 = await articleService.GetAsync(textid);
-            var master = (await articleService.BrowseAsync(null, new int[0], 0, 1)).Where(x => x.Id==article1.Id).SingleOrDefault();
+            var master = (await articleService.BrowseAsync(1 ,null, article1.Id)).SingleOrDefault();
             var article2 = await articleService.GetAsync(master.Master.Id);
             //Article1 = CreateArticle(article1);
             //Article2 = CreateArticle(article2);
