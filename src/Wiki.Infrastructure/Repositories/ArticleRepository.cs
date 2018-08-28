@@ -46,7 +46,7 @@ namespace Wiki.Infrastructure.Repositories
                 //// text
                 paramList = new DynamicParameters();
                 paramList.Add("ArticleID", articleId, direction: ParameterDirection.Input);
-                paramList.Add("AuthorID", 3, direction: ParameterDirection.Input);
+                paramList.Add("AuthorID", article.Master.Author.Id, direction: ParameterDirection.Input);
                 paramList.Add("StatusID", article.Master.Status.Id, direction: ParameterDirection.Input);
                 paramList.Add("Content", article.Master.Content, direction: ParameterDirection.Input);
                 paramList.Add("Title", article.Master.Title, direction: ParameterDirection.Input);
@@ -101,9 +101,12 @@ namespace Wiki.Infrastructure.Repositories
                         var tags = await connection.QueryAsync<TextTag>(tagsQuery, new { txid = text.Id });
                         var userQuery = $"Select id, email from Users where id = (Select authorid from texts where id = {text.Id})";
                         var user = (await connection.QueryAsync<User>(userQuery)).Single();
+                        var supervisorQuery = $"Select id, email from Users where id = (Select supervisorid from texts where id = {text.Id})";
+                        var supervisor = (await connection.QueryAsync<User>(supervisorQuery)).SingleOrDefault();
                         text.Author = user;
                         text.Tags = tags;
                         text.Status = status;
+                        text.SetSupervisor(supervisor);
                     }
                     article.Texts = texts;
                     article.Master = article.Texts.Where(x => x.Status.Status == "Master").SingleOrDefault();
@@ -126,6 +129,8 @@ namespace Wiki.Infrastructure.Repositories
             var category = (await connection.QueryAsync<ArticleCategory>(categoryQuery)).Single();
             var userQuery = $"Select id, email from Users where id = (Select authorid from texts where id = {text.Id})";
             var user = (await connection.QueryAsync<User>(userQuery)).Single();
+            var supervisorQuery = $"Select id, email from Users where id = (Select supervisorid from texts where id = {text.Id})";
+            var supervisor = (await connection.QueryAsync<User>(supervisorQuery)).SingleOrDefault();
             var statusQuery = $"Select * from statuses where id = (Select statusid from texts where id = {text.Id})";
             var status = (await connection.QueryAsync<TextStatus>(statusQuery)).Single();
             var tagsQuery = $"Select id, tag from textstags tt, tags t where t.ID = tt.TAGID and textid = {text.Id}";
@@ -134,6 +139,7 @@ namespace Wiki.Infrastructure.Repositories
             text.SetAuthor(user);
             text.SetStatus(status);
             text.SetTags(tags);
+            text.SetSupervisor(supervisor);
             article.SetCategory(category);
             article.SetMaster(text);
             //OracleDataReader reader = cmd.ExecuteReader();
@@ -177,8 +183,36 @@ namespace Wiki.Infrastructure.Repositories
         {
             using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
             {
-                string query = $"Update texts set articleid={article.Id}, authorid={article.Master.Author.Id}, statusid={article.Master.Status}, content={article.Master.Content}, title={article.Master.Title}, version={article.Master.Version}, textcomment={article.Master.TextComment}, createdate={article.Master.CreatedAt} where id={article.Master.Id}";
-                await connection.QueryAsync(query);
+                var paramList = new DynamicParameters();
+                paramList.Add("Id", article.Master.Id, direction: ParameterDirection.Input);
+                paramList.Add("ArticleID", article.Id, direction: ParameterDirection.Input);
+                paramList.Add("AuthorID", article.Master.Author.Id, direction: ParameterDirection.Input);
+                paramList.Add("StatusID", article.Master.Status.Id, direction: ParameterDirection.Input);
+                paramList.Add("Content", article.Master.Content, direction: ParameterDirection.Input);
+                paramList.Add("Title", article.Master.Title, direction: ParameterDirection.Input);
+                paramList.Add("Version", article.Master.Version, direction: ParameterDirection.Input);
+                if(article.Master.TextComment == null)
+                    paramList.Add("TextComment", null, direction: ParameterDirection.Input);
+                else
+                    paramList.Add("TextComment", article.Master.TextComment, direction: ParameterDirection.Input);
+
+                if (article.Master.Supervisor == null)
+                    paramList.Add("SupervisorID", null, direction: ParameterDirection.Input);
+                else
+                    paramList.Add("SupervisorID", article.Master.Supervisor.Id, direction: ParameterDirection.Input);
+                paramList.Add("CreatedAt", article.Master.CreatedAt, direction: ParameterDirection.Input);
+                //connection.Execute("Insert into Texts (articleid, authorid, statusid, content, title, version, createdat) Values (:ArticleID, :AuthorID, :StatusID, :Content, :Title, :Version, :CreatedAt) returning Id into :Id", paramList);
+
+                
+                string query = $"Update texts set articleid=:ArticleID, authorid=:AuthorID, statusid=:StatusID, content=:Content, title=:Title, version=:Version, textcomment=:TextComment, createdat=:CreatedAt, supervisorid=:SupervisorId where id=:Id";
+                Task task = connection.ExecuteAsync(query, paramList);
+
+                paramList = new DynamicParameters();
+                paramList.Add("Id", article.Master.Id, direction: ParameterDirection.Input);
+                paramList.Add("CategoryId", article.Category.Id, direction: ParameterDirection.Input);
+                query = $"Update articles set categoryid=:CategoryId where id=:Id";
+                await connection.ExecuteAsync(query, paramList);
+                await task;
             }
         }
 

@@ -15,6 +15,7 @@ namespace Wiki.Web.ViewModels
         [Required]
         public string Content { get; set; }
         public Author Author { get; set; }
+        public User Supervisor { get; set; }
         public CategoryFilter Category { get; set; }
         public List<TagFilter> Tags { get; set; }
         public StatusFilter Status { get; set; }

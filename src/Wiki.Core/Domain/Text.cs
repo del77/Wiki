@@ -59,6 +59,7 @@ namespace Wiki.Core.Domain
         public double Version { get; set; }
         public string TextComment { get; set; }
         public DateTime CreatedAt { get; set; }
+        public User Supervisor { get; set; }
 
         public IEnumerable<Suggestion> Suggestions
         {
@@ -80,6 +81,11 @@ namespace Wiki.Core.Domain
         public void SetComment(string textcomment)
         {
             TextComment = textcomment;
+        }
+
+        public void SetSupervisor(User supervisor)
+        {
+            Supervisor = supervisor;
         }
     }
 

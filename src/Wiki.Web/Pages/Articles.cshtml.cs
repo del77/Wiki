@@ -63,13 +63,13 @@ namespace Wiki.Web.Pages
 
             };
             
-            if (!CanRead)
-                selectedStatus = 1;
             if (mine == 1)
             {
                 selectedUser = userId;
                 CanRead = true;
             }
+            else if (!CanRead)
+                selectedStatus = 1;
             var res = await articleService.BrowseAsync(selectedStatus, selectedUser, null);
             //var res2 = (await articleService.BrowseAsync(title, selectedTags, selectedCategory, selectedStatus)).ToPagedList(1, 5);
 
@@ -165,7 +165,14 @@ namespace Wiki.Web.Pages
                         Id = text.Author.Id,
                         Email = text.Author.Email
                     };
-
+                    if (text.Supervisor != null)
+                    {
+                        article.Supervisor = new User
+                        {
+                            Id = text.Supervisor.Id,
+                            Email = text.Supervisor.Email
+                        };
+                    }
                     Articles.Add(article);
                 }
             }

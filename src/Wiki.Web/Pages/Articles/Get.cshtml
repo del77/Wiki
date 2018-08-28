@@ -40,12 +40,21 @@
         <a data-toggle="modal" data-target="#suggestionModal">Add suggestion</a><br />
         @if (Model.HttpContext.User.Identity.IsAuthenticated)
         {
-            <a asp-page="/Articles/Add" asp-route-textid="@Model.Article.TextId">Edit</a><br />
-
+            @if (!(Model.Article.Status.Status == "NotSubmitted" && Model.Article.Author.Id != Model.UserId))
+            {
+                <a asp-page="/Articles/Add" asp-route-textid="@Model.Article.TextId">Edit</a><br />
+            }
+            @if (Model.Article.Supervisor != null)
+            {
+                @if (@Model.Article.Status.Status == "Moderated" && HttpContextAccessor.HttpContext.User.IsInRole("Accept") && Model.UserId == Model.Article.Supervisor.Id)
+                {
+                    <a asp-page="/Articles/Modify" asp-route-textid="@Model.Article.TextId" asp-route-status="22">Accept</a><br />
+                    <a data-toggle="modal" data-target="#rejectModal">Reject</a>
+                }
+            }
             @if (@Model.Article.Status.Status == "Waiting" && HttpContextAccessor.HttpContext.User.IsInRole("Accept"))
             {
-                <a asp-page="/Articles/Modify" asp-route-textid="@Model.Article.TextId" asp-route-status="22">Accept</a><br />
-                <a data-toggle="modal" data-target="#rejectModal">Reject</a>
+                <a asp-page="/Articles/Modify" asp-route-textid="@Model.Article.TextId" asp-route-status="61">Become supervisor</a><br />
             }
             @if (HttpContextAccessor.HttpContext.User.IsInRole("Read"))
             {

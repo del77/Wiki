@@ -16,18 +16,22 @@ namespace Wiki.Web.Pages.Articles
         private readonly IArticleService articleService;
         
         private readonly ClaimsPrincipal user;
+        private readonly int userId;
 
         public ModifyModel(IArticleService articleSerivce, IHttpContextAccessor httpContextAccessor)
         {
             this.articleService = articleSerivce;
             
             user = httpContextAccessor.HttpContext.User;
+            var claims = user.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+            if (claims != null)
+                userId = Convert.ToInt32(claims.Value);
         }
         public async Task OnGetAsync(int textid, int status)
         {
             if ( (status == 2 || status == 3) && user.IsInRole("Accept"))
                 await articleService.ChangeStatus(textid, status);
-            if(status == 1 && user.IsInRole("Publish"))
+            else if(status == 1 && user.IsInRole("Publish"))
             {
                 var article = await articleService.GetAsync(textid);
                 var masterForArticle = (await articleService.BrowseAsync(1, null, article.Id)).SingleOrDefault();
@@ -36,6 +40,12 @@ namespace Wiki.Web.Pages.Articles
                 tasks.Add(Task.Factory.StartNew(() => articleService.ChangeStatus(textid, status)));
                 tasks.Add(Task.Factory.StartNew(() => articleService.ChangeStatus(masterForArticle.Master.Id, 22))); // change actual master status to accepted
                 Task.WaitAll(tasks.ToArray());
+            }
+            else if(status==61 && user.IsInRole("Accept"))
+            {
+                await articleService.ChangeStatus(textid, status);
+                await articleService.SetSupervisor(textid, userId);
+
             }
         }
 

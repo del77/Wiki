@@ -19,6 +19,7 @@ namespace Wiki.Web.Pages.Articles
         private readonly ISuggestionService suggestionService;
         private readonly IHttpContextAccessor httpContextAccessor;
         public readonly ClaimsPrincipal User;
+        public readonly int UserId;
         [BindProperty]
         public ViewModels.Article Article { get; set; }
         [BindProperty]
@@ -36,6 +37,9 @@ namespace Wiki.Web.Pages.Articles
             this.suggestionService = suggestionService;
             this.httpContextAccessor = httpContextAccessor;
             User = httpContextAccessor.HttpContext.User;
+            var claims = (httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"));
+            if (claims != null)
+                UserId = Convert.ToInt32(claims.Value);
         }
 
         public async Task<IActionResult> OnGetAsync(int articleid, int textid)
@@ -52,7 +56,7 @@ namespace Wiki.Web.Pages.Articles
                 diffHelper = new HtmlDiff.HtmlDiff(masterForArticleDetails.Master.Title, article.Master.Title);
                 TitleComparision = diffHelper.Build();
             }
-            if (!httpContextAccessor.HttpContext.User.IsInRole("Read") && article.Master.Status.Id != 1)
+            if (!httpContextAccessor.HttpContext.User.IsInRole("Read") && article.Master.Status.Id != 1 && article.Master.Author.Id != UserId)
                 return Page();
 
 
@@ -91,6 +95,7 @@ namespace Wiki.Web.Pages.Articles
                         Status = text.Status.Status,
                         Selected = false
                     };
+
 
 
                     OtherVersions.Add(art);
@@ -135,6 +140,12 @@ namespace Wiki.Web.Pages.Articles
                     Email = newArt.Master.Author.Email
                 }
             };
+            if (newArt.Master.Supervisor != null)
+                article.Supervisor = new User
+                {
+                    Id = newArt.Master.Supervisor.Id,
+                    Email = newArt.Master.Supervisor.Email
+                };
             var tags = new List<TagFilter>();
             foreach (var tag in newArt.Master.Tags)
             {

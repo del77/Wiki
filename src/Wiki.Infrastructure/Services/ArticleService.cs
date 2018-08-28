@@ -14,11 +14,14 @@ namespace Wiki.Infrastructure.Services
     public class ArticleService : IArticleService
     {
         private readonly IArticleRepository articleRepository;
+        private readonly IArticleTagsRepository articleTagsRepository;
         private readonly IMapper mapper;
-        public ArticleService(IArticleRepository articleRepository, IMapper mapper)
+
+        public ArticleService(IArticleRepository articleRepository, IArticleTagsRepository articleTagsRepository, IMapper mapper)
         {
             this.mapper = mapper;
             this.articleRepository = articleRepository;
+            this.articleTagsRepository = articleTagsRepository;
         }
 
 
@@ -55,6 +58,7 @@ namespace Wiki.Infrastructure.Services
             var tags = new List<TextTag>();
             foreach (var tag in selectedTags)
             {
+
                 tags.Add(new TextTag(tag));
             }
 
@@ -83,18 +87,25 @@ namespace Wiki.Infrastructure.Services
         {
             var article = new Article(articleId);
 
-            var tags = new List<TextTag>();
+            var tags = await articleTagsRepository.GetTags();
+            var tasks = new List<Task>();
+
+            foreach (var tag in tags)
+            {
+                tasks.Add(articleTagsRepository.RemoveAsync(textId, tag.Id));
+            }
+            await Task.WhenAll(tasks);
+            tasks.Clear();
             foreach (var tag in selectedTags)
             {
-                tags.Add(new TextTag(tag));
+                var addedTag = new TextTag(tag, textId);
+                tasks.Add(articleTagsRepository.AddAsync(addedTag));
             }
 
             var user = new User(author);
-
             var text = new Text(textId, title, content, version);
             var textStatus = new TextStatus(status);
             text.SetStatus(textStatus);
-            text.SetTags(tags);
             text.SetAuthor(user);
             text.SetComment(textcomment);
             article.SetText(text);
@@ -102,7 +113,15 @@ namespace Wiki.Infrastructure.Services
             var category = new ArticleCategory(selectedCategory);
             article.SetCategory(category);
 
+            foreach(var tag in tags)
+            tasks.Add(articleRepository.UpdateAsync(article));
+            await Task.WhenAll(tasks);
+        }
 
+        public async Task SetSupervisor(int textid, int userId)
+        {
+            var article = await articleRepository.GetAsync(textid);
+            article.Master.SetSupervisor(new User(userId));
             await articleRepository.UpdateAsync(article);
         }
     }

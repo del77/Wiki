@@ -13,5 +13,6 @@ namespace Wiki.Infrastructure.Services
         Task AddAsync(int articleId, string title, string content, int status, int[] selectedTags, int selectedCategory, int author, double version);
         Task ChangeStatus(int textid, int status, string comment="");
         Task UpdateVersion(int articleId, int textId, string title, string content, int status, int[] selectedTags, int selectedCategory, int author, double version, string textcomment);
+        Task SetSupervisor(int textid, int userId);
     }
 }

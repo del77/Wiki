@@ -72,6 +72,9 @@
                     <th style="position: relative">
                         User
                     </th>
+                    <th style="position: relative">
+                        Supervisor
+                    </th>
                 }
 
             </tr>
@@ -93,6 +96,9 @@
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Author.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Supervisor.Email)
                     </td>
                 }
             </tr>

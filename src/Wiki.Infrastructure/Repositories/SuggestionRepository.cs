@@ -41,7 +41,7 @@ namespace Wiki.Infrastructure.Repositories
             using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
             {
                 //var query = $"insert into suggestions (authorid, content, textid) values ({suggestion.Author..NullString()}, '{suggestion.Content}', {suggestion.TextId.NullString()})";
-                connection.ExecuteAsync("Insert into Suggestions (authorid, content, textid, served) Values (:Authorid, :Content, :Textid, :Served)", paramList);
+                await connection.ExecuteAsync("Insert into Suggestions (authorid, content, textid, served) Values (:Authorid, :Content, :Textid, :Served)", paramList);
                 
             }
         }

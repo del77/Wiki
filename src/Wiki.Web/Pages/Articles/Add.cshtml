@@ -68,7 +68,7 @@
                 {
                     <select asp-items="@Model.Filter.Categories" asp-for="Article.Category.Id" class="js-example-basic-single" style="width:50%"><option></option></select>
                 }
-                else
+                @if (Model.Editing)
                 {
                     <input type="hidden" asp-for="Article.TextId" />
                 }

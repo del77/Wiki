@@ -41,7 +41,7 @@ namespace Wiki.Web.Pages.Articles
             if (textid != 0)
             {
                 var article = await articleService.GetAsync(textid);
-                if (!httpContextAccessor.HttpContext.User.IsInRole("Read") && article.Master.Status.Id != 1)
+                if (!httpContextAccessor.HttpContext.User.IsInRole("Read") && article.Master.Status.Id != 1 && article.Master.Author.Id != userId)
                     return Page();
                 Article = new ViewModels.Article
                 {
@@ -66,17 +66,18 @@ namespace Wiki.Web.Pages.Articles
                     }
                 };
                 var tags = new List<TagFilter>();
-                //foreach (var tag in article.Master.Tags)
-                //{
-                //    tags.Add(new TagFilter
-                //    {
-                //        Id = tag.Id,
-                //        Tag = tag.Tag,
-                //        Checked = true
-                //    });
-                //    Filter.Tags2.Where(x => x.Id == tag.Id).Single().Checked = true;
-                //}
+                foreach (var tag in article.Master.Tags)
+                {
+                    tags.Add(new TagFilter
+                    {
+                        Id = tag.Id,
+                        Tag = tag.Tag,
+                        Checked = true
+                    });
+                    Filter.Tags.Where(x => x.Value == tag.Id.ToString()).Single().Selected = true;
+                }
                 Article.Tags = tags;
+                //Article.Tags.Single(x => x.Id == 2).Checked = true;
                 Article.Content = article.Master.Content;
                 Article.Title = article.Master.Title;
                 Editing = true;
@@ -97,26 +98,48 @@ namespace Wiki.Web.Pages.Articles
                     var editedArticle = await articleService.GetAsync(Article.TextId);
                     //var master = (await articleService.BrowseAsync(1, null, null)).Where(x => x.Id == editedArticle.Id).SingleOrDefault();
                     var master = (await articleService.BrowseAsync(1, null, editedArticle.Id)).SingleOrDefault();
-                    var masterDetails = await articleService.GetAsync(master.Master.Id);
-                    Article.Comment = editedArticle.Master.TextComment;
-                    Article.Version = masterDetails.Master.Version + 0.1;
-                    Article.Category = new CategoryFilter
+                    if (master.Master != null)
                     {
-                        Id = masterDetails.Category.Id
-                    };
-                }
-                else
-                    Article.Version = 1.0;
-                if (submit == 0)
-                    await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version);
-                else if (submit == 1)
-                {
-                    if(Article.TextId != 0)
-                    {
-                        await articleService.UpdateVersion(Article.ArticleId, Article.TextId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, Article.Comment);
+                        var masterDetails = await articleService.GetAsync(master.Master.Id);
+                        Article.Version = masterDetails.Master.Version + 0.1;
                     }
                     else
+                        Article.Version = 1.0;
+                    Article.Comment = editedArticle.Master.TextComment;
+                    Article.ArticleId = editedArticle.Id;
+                    Article.Category = new CategoryFilter
+                    {
+                        //Id = master.Category.Id
+                        Id = editedArticle.Category.Id
+                   };
+
+                    if (submit == 0 && editedArticle.Master.Status.Status == "NotSubmitted")
+                        await articleService.UpdateVersion(Article.ArticleId, Article.TextId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version, Article.Comment);
+                    else if (submit == 0 && editedArticle.Master.Status.Status != "NotSubmitted")
+                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version);
+                    else if (submit == 1 && editedArticle.Master.Status.Status == "NotSubmitted")
+                    {
+                        await articleService.UpdateVersion(Article.ArticleId, Article.TextId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, Article.Comment);
+                        //await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version);
+                    }
+                    else if (submit == 1 && editedArticle.Master.Status.Status != "NotSubmitted")
                         await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version);
+                }
+                //else
+
+                //if (Article.TextId != 0)
+                //{
+                    
+                //}
+                else
+                {
+                    Article.Version = 1.0;
+                    if (submit == 0)
+                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version);
+                    else if (submit == 1)
+                    {
+                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version);
+                    }
                 }
             }
             
