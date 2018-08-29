@@ -45,7 +45,7 @@ namespace Wiki.Web.Pages.Articles
         public async Task<IActionResult> OnGetAsync(int articleid, int textid)
         {
             var article = await articleService.GetAsync(textid);
-            var masterForArticle = (await articleService.BrowseAsync(1, null, article.Id)).SingleOrDefault();
+            var masterForArticle = (await articleService.BrowseAsync(1, null, article.Id, null)).SingleOrDefault();
             ArticleDetailsDto masterForArticleDetails;
             if (masterForArticle.Master != null)
             {
@@ -62,7 +62,7 @@ namespace Wiki.Web.Pages.Articles
 
             Article = CreateArticle(article);
 
-            var otherVersions = await articleService.BrowseAsync(null, null, article.Id);
+            var otherVersions = await articleService.BrowseAsync(null, null, article.Id, null);
             OtherVersions = new List<ViewModels.Article>();
             foreach (var item in otherVersions)
             {
@@ -122,6 +122,7 @@ namespace Wiki.Web.Pages.Articles
                 Version = newArt.Master.Version,
                 Comment = newArt.Master.TextComment,
                 CreatedAt = newArt.Master.CreatedAt,
+                Avatar = String.Format("data:image/gif;base64,{0}", Convert.ToBase64String(newArt.Master.Avatar)),
                 Category = new ViewModels.CategoryFilter
                 {
                     Id = newArt.Category.Id,

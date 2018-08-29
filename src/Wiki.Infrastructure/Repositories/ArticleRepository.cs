@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ namespace Wiki.Infrastructure.Repositories
             {
                 //// art
                 var paramList = new DynamicParameters();
+
                 int articleId;
                 if (article.Id == 0)
                 {
@@ -53,9 +55,15 @@ namespace Wiki.Infrastructure.Repositories
                 paramList.Add("Version", article.Master.Version, direction: ParameterDirection.Input);
                 paramList.Add("Id", DbType.Int32, direction: ParameterDirection.Output);
                 paramList.Add("CreatedAt", article.Master.CreatedAt, direction: ParameterDirection.Input);
-                connection.Execute("Insert into Texts (articleid, authorid, statusid, content, title, version, createdat) Values (:ArticleID, :AuthorID, :StatusID, :Content, :Title, :Version, :CreatedAt) returning Id into :Id", paramList);
+                if(article.Master.Avatar == null)
+                    paramList.Add("Avatar", null, direction: ParameterDirection.Input);
+                else
+                    paramList.Add("Avatar", article.Master.Avatar, direction: ParameterDirection.Input);
+                connection.Execute("Insert into Texts (articleid, authorid, statusid, content, title, version, createdat, avatar) Values (:ArticleID, :AuthorID, :StatusID, :Content, :Title, :Version, :CreatedAt, :Avatar) returning Id into :Id", paramList);
                 var textId = paramList.Get<int>("Id");
                 //// text
+
+                
 
                 //// textstags
                 foreach (var tag in article.Master.Tags)
@@ -66,7 +74,7 @@ namespace Wiki.Infrastructure.Repositories
             }
         }
 
-        public async Task<IEnumerable<Article>> GetAllAsync(int? selectedStatus, int? selectedUser, int? selectedArticle)
+        public async Task<IEnumerable<Article>> GetAllAsync(int? selectedStatus, int? selectedUser, int? selectedArticle, int? selectedSupervisor)
         {
             var articleQuery = "SELECT a.ID FROM Articles a";
             if(selectedArticle != null)
@@ -87,11 +95,12 @@ namespace Wiki.Infrastructure.Repositories
                         textsQuery += $" and statusid={selectedStatus}";
                     if(selectedUser!=null)
                         textsQuery += $" and authorid={selectedUser}";
+                    if(selectedSupervisor!=null)
+                        textsQuery += $" and supervisorid={selectedSupervisor}";
 
-                   
-                    
+
                     //var textsQuery = "Select t.Id, Title from Texts t, Statuses s where t.statusid = s.id and ArticleID = :artid and t.Title like :tit";
-                    
+
                     var texts = connection.Query<Text>(textsQuery, new { artid = article.Id });
 
                     var tagsQuery = "Select * from textstags tt, tags t where t.ID = tt.TAGID and textid = :txid";
@@ -122,7 +131,7 @@ namespace Wiki.Infrastructure.Repositories
             using(IDbConnection connection = new OracleConnection(settings.ConnectionString))
             {
 
-            var textsQuery = $"Select Id, Articleid, Title, Content, Version, CreatedAt, textComment from Texts where id = {textid}";
+            var textsQuery = $"Select Id, Articleid, Title, Content, Version, CreatedAt, textComment, Avatar from Texts where id = {textid}";
             var text = (await connection.QueryAsync<Text>(textsQuery)).Single();
             var article = new Article(text.ArticleId);
             var categoryQuery = $"Select * From Categories where ID = (Select categoryid from articles where id = {article.Id})";
@@ -135,6 +144,7 @@ namespace Wiki.Infrastructure.Repositories
             var status = (await connection.QueryAsync<TextStatus>(statusQuery)).Single();
             var tagsQuery = $"Select id, tag from textstags tt, tags t where t.ID = tt.TAGID and textid = {text.Id}";
             var tags = await connection.QueryAsync<TextTag>(tagsQuery);
+            
 
             text.SetAuthor(user);
             text.SetStatus(status);

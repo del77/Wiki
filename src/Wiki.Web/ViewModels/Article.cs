@@ -22,5 +22,6 @@ namespace Wiki.Web.ViewModels
         public double Version { get; set; }
         public string Comment { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string Avatar { get; set; }
     }
 }

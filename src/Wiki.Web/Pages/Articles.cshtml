@@ -9,52 +9,7 @@
 @{
     ViewData["Title"] = "About";
 }
-
-
-
-
-<h2>@ViewData["Title"]</h2>
-
-
-<form asp-page="./Articles" method="get">
-
-    <div class="form-actions no-color">
-        <p>
-            Find by name:
-        </p>
-        <input type="search" name="title" value="@Model.Filter.Title" class="glyphicon-search" />
-        <label>Category</label>
-        <select asp-items="@Model.Filter.Categories" name="selectedCategory"></select>
-        @if (Model.CanRead)
-        {
-            <label>Status</label>
-            <select asp-items="@Model.Filter.Statuses" name="selectedStatus"></select>
-        }
-        <table class="table-responsive">
-            <tr>
-                @{
-                    foreach (var tag in Model.Filter.Tags2)
-                    {
-                        @:<td>
-                            <input type="checkbox"
-                                   name="selectedTags"
-                                   value="@tag.Id"
-                                   @(Html.Raw(tag.Checked ? "checked=\"checked\"" : "")) />
-                            @tag.Tag
-                        @:</td>
-                    }
-                @:</tr>
-                }
-            </table>
-
-            <input type="submit" value="Search" class="btn btn-default" />
-
-        </div>
-    </form>
-    <a asp-page="./Articles">Back to full List</a>
-
-
-
+<h2>Articles</h2>
     <table id="example" class="display">
         <thead>
             <tr>

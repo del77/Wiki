@@ -32,8 +32,13 @@
             <p>Status: @Model.Article.Status.Status</p>
 
         }
+
     </div>
     <div class="col-md-10">
+        @if (Model.Article.Avatar != null)
+        {
+            <img src="@Model.Article.Avatar" style="width:100%" />
+        }
         @Html.Raw("<div class=\"article\">" + Model.Article.Content + "</div>")
     </div>
     <div class="col-md-2 table-bordered" style="float:right">

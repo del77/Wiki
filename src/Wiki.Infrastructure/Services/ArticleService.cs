@@ -26,9 +26,9 @@ namespace Wiki.Infrastructure.Services
 
 
 
-        public async Task<IEnumerable<ArticleDto>> BrowseAsync(int? selectedStatus, int? selectedUser, int? selectedArticle)
+        public async Task<IEnumerable<ArticleDto>> BrowseAsync(int? selectedStatus, int? selectedUser, int? selectedArticle, int? selectedSupervisor)
         {
-            var articles = await articleRepository.GetAllAsync(selectedStatus, selectedUser, selectedArticle);
+            var articles = await articleRepository.GetAllAsync(selectedStatus, selectedUser, selectedArticle, selectedSupervisor);
             return mapper.Map<IEnumerable<ArticleDto>>(articles);
         }
 
@@ -51,7 +51,7 @@ namespace Wiki.Infrastructure.Services
             return filter;
         }
 
-        public async Task AddAsync(int articleId, string title, string content, int status, int[] selectedTags, int selectedCategory, int author, double version)
+        public async Task AddAsync(int articleId, string title, string content, int status, int[] selectedTags, int selectedCategory, int author, double version, byte[] image)
         {
             var article = new Article(articleId);
 
@@ -69,6 +69,8 @@ namespace Wiki.Infrastructure.Services
             text.SetStatus(textStatus);
             text.SetTags(tags);
             text.SetAuthor(user);
+            if(image.Length!=0)
+                text.Avatar = image;
             article.SetText(text);
 
             var category = new ArticleCategory(selectedCategory);

@@ -30,6 +30,7 @@ namespace Wiki.Core.Domain
         public int Id { get;  set; }
         
         public Text Master { get;  set; }
+        
         //public Category category {get; protected set;}
         public ArticleCategory Category {get;  set;}
         public IEnumerable<Text> Texts { get { return texts; }

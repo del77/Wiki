@@ -26,8 +26,8 @@ namespace Wiki.Web.Pages
         [BindProperty]
         public StaticPagedList<ViewModels.Article> ArticlesPaged { get; set; }
 
-        [BindProperty]
-        public Filter Filter { get; set; }
+        //[BindProperty]
+        //public Filter Filter { get; set; }
         [BindProperty]
         public BrowseFilter BrowseFilter { get; set; }
         
@@ -54,23 +54,26 @@ namespace Wiki.Web.Pages
             SetupFilter();
             int? selectedStatus = null;
             int? selectedUser = null;
-            Filter = new Filter
-            {
-                Categories = new SelectList(new int[] { }),
-                SelectedTags = new List<int>(),
-                Statuses = new SelectList(new int[] { }),
-                Tags2 = new List<TagFilter>()
+            int? selectedSupervisor = null;
 
-            };
             
             if (mine == 1)
             {
                 selectedUser = userId;
                 CanRead = true;
             }
+            else if(mine == 2)
+            {
+                if(!User.IsInRole("Accept"))
+                {
+                    // no access
+                }
+                selectedSupervisor = userId;
+                CanRead = true;
+            }
             else if (!CanRead)
                 selectedStatus = 1;
-            var res = await articleService.BrowseAsync(selectedStatus, selectedUser, null);
+            var res = await articleService.BrowseAsync(selectedStatus, selectedUser, null, selectedSupervisor);
             //var res2 = (await articleService.BrowseAsync(title, selectedTags, selectedCategory, selectedStatus)).ToPagedList(1, 5);
 
             Articles = new List<ViewModels.Article>();

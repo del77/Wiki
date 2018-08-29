@@ -3,17 +3,81 @@
     ViewData["Title"] = "test";
 }
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+    .absoluteCenterWrapper {
+        display: block;
+        display: flex;
+        padding: 20px;
+        margin: 10px;
+    }
+
+    .absoluteCenterWrapper__right {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        padding-left: 50px;
+    }
+
+    .absoluteCenterWrapper__left {
+        background: orange;
+    }
+
+
+    .absoluteCenterWrapper p {
+        margin-bottom: 15px;
+    }
+
+    .absoluteCenterWrapper img {
+        width: 300px;
+    }
+
+</style>
+
+<div class="row">
+    <div class="col-md-6">
+        <a href="http://www.example.com/" class="absoluteCenterWrapper table-bordered">
+            <img src="http://firmowo.com/wp-content/uploads/2014/01/Ma%C5%82y-G%C5%82%C3%B3d.png" class="absoluteCenter">
+            <p>Paragraph goes here.</p>
+            <p></p>
+            <p>by xd </p>
+        </a>
+        <a href="http://www.example.com/" class="absoluteCenterWrapper">
+            <img src="http://firmowo.com/wp-content/uploads/2014/01/Ma%C5%82y-G%C5%82%C3%B3d.png" class="absoluteCenter">
+            <p>Paragraph goes here.</p>
+            <p></p>
+            <p>by xd </p>
+        </a>
+    </div>
+    <div style="float: right">
+        <a href="http://www.example.com/" class="absoluteCenterWrapper">
+            <img src="http://firmowo.com/wp-content/uploads/2014/01/Ma%C5%82y-G%C5%82%C3%B3d.png" class="absoluteCenter">
+            <p>Paragraph goes here.</p>
+            <p></p>
+            <p>by xd </p>
+        </a>
+        <a href="http://www.example.com/" class="absoluteCenterWrapper">
+            <img src="http://firmowo.com/wp-content/uploads/2014/01/Ma%C5%82y-G%C5%82%C3%B3d.png" class="absoluteCenter">
+            <p>Paragraph goes here.</p>
+
+            <p>by xd </p>
+        </a>
+    </div>
+</div>
+
+
+<!--
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 <script>
     var jquery = jQuery.noConflict();
-    jquery(document).ready(function() {
+    jquery(document).ready(function () {
         jquery('.js-example-basic-multiple').select2();
     });
 </script>
 
-<select class="js-example-basic-multiple" name="states[]" multiple="multiple">
+<se
+    lect class="js-example-basic-multiple" name="states[]" multiple="multiple">
     <option value="AL">Alabama</option>
     ...
     <option value="WY">Wyoming</option>
@@ -22,9 +86,6 @@
 
 
 
-
-<script type="text/javascript" src="/js/tinymce/tinymce.min.js"></script>
-<!-- Just be careful that you give correct path to your tinymce.min.js file, above is the default example -->
 <script>
     tinymce.init({
         selector: "textarea#elm1",
@@ -51,4 +112,4 @@
 </script>
 <body>
 <textarea id="elm1" name="area"></textarea>
-</body>
+</body>-->

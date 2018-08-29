@@ -9,5 +9,6 @@ namespace Wiki.Infrastructure.DTO
         public string Content { get; set; }
         public string TextComment { get; set; }
         public DateTime CreatedAt { get; set; }
+        public byte[] Avatar { get; set; }
     }
 }

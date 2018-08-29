@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Oracle.ManagedDataAccess.Client;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,6 +13,7 @@ using Wiki.Infrastructure.DTO;
 using Wiki.Infrastructure.Services;
 using Wiki.Web.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Wiki.Web.Pages.Articles
 {
@@ -25,10 +27,15 @@ namespace Wiki.Web.Pages.Articles
         [BindProperty]
         public Filter Filter { get; set; }
         private readonly int userId;
+        private readonly IHostingEnvironment _environment;
+
         public bool Editing { get; set; }
-        
-        public AddModel(IArticleService articleService, IHttpContextAccessor httpContextAccessor)
+        [BindProperty]
+        public IFormFile Upload { get; set; }
+
+        public AddModel(IArticleService articleService, IHttpContextAccessor httpContextAccessor, IHostingEnvironment _environment)
         {
+            this._environment = _environment;
             Article = new Article();
             this.articleService = articleService;
             this.httpContextAccessor = httpContextAccessor;
@@ -63,7 +70,8 @@ namespace Wiki.Web.Pages.Articles
                     {
                         Id = article.Master.Author.Id,
                         Email = article.Master.Author.Email
-                    }
+                    },
+                    Avatar = String.Format("data:image/gif;base64,{0}", Convert.ToBase64String(article.Master.Avatar))
                 };
                 var tags = new List<TagFilter>();
                 foreach (var tag in article.Master.Tags)
@@ -89,22 +97,34 @@ namespace Wiki.Web.Pages.Articles
             return Page();
         }
 
-        public async Task OnPostAsync(int[] selectedTags, int submit, Article Article = null)
+        public async Task OnPostAsync(int[] selectedTags, int submit, IFormFile avatar, Article Article = null)
         {
+
+
             if (ModelState.IsValid)
             {
+                byte[] image = new byte[] { };
+                if (avatar != null)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        avatar.CopyTo(memoryStream);
+                        image = memoryStream.ToArray();
+                    }
+                }
+                
                 if (Article.TextId != 0)
                 {
                     var editedArticle = await articleService.GetAsync(Article.TextId);
                     //var master = (await articleService.BrowseAsync(1, null, null)).Where(x => x.Id == editedArticle.Id).SingleOrDefault();
-                    var master = (await articleService.BrowseAsync(1, null, editedArticle.Id)).SingleOrDefault();
+                    var master = (await articleService.BrowseAsync(1, null, editedArticle.Id, null)).SingleOrDefault();
                     if (master.Master != null)
                     {
                         var masterDetails = await articleService.GetAsync(master.Master.Id);
                         Article.Version = masterDetails.Master.Version + 0.1;
                     }
                     else
-                        Article.Version = 1.0;
+                    Article.Version = 1.0;
                     Article.Comment = editedArticle.Master.TextComment;
                     Article.ArticleId = editedArticle.Id;
                     Article.Category = new CategoryFilter
@@ -116,14 +136,14 @@ namespace Wiki.Web.Pages.Articles
                     if (submit == 0 && editedArticle.Master.Status.Status == "NotSubmitted")
                         await articleService.UpdateVersion(Article.ArticleId, Article.TextId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version, Article.Comment);
                     else if (submit == 0 && editedArticle.Master.Status.Status != "NotSubmitted")
-                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version);
+                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version, image);
                     else if (submit == 1 && editedArticle.Master.Status.Status == "NotSubmitted")
                     {
                         await articleService.UpdateVersion(Article.ArticleId, Article.TextId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, Article.Comment);
                         //await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version);
                     }
                     else if (submit == 1 && editedArticle.Master.Status.Status != "NotSubmitted")
-                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version);
+                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, image);
                 }
                 //else
 
@@ -135,10 +155,10 @@ namespace Wiki.Web.Pages.Articles
                 {
                     Article.Version = 1.0;
                     if (submit == 0)
-                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version);
+                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version, image);
                     else if (submit == 1)
                     {
-                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version);
+                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, image);
                     }
                 }
             }

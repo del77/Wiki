@@ -3,29 +3,61 @@
 @{
     ViewData["Title"] = "AdminPanel";
 }
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<style>
+    .collapsible:after {
+        content: '\02795'; /* Unicode character for "plus" sign (+) */
+        font-size: 13px;
+        color: white;
+        float: right;
+        margin-left: 5px;
+    }
+
+    .active:after {
+        content: "\2796"; /* Unicode character for "minus" sign (-) */
+    }
+</style>
+
 @if (Model.User.IsInRole("Read"))
 {
     <button class="collapsible">Manage Users</button>
     <div class="content">
         <div class="container">
-            
-            <ul class="nav nav-pills nav-stacked">
-                @foreach(var user in Model.Users)
-                {
-                <li><a asp-page="/Users/Edit" asp-route-userId="@user.Id">@Html.DisplayFor(model => user.Email)</a></li>
-
-
-                }
-
-            </ul>
+            <table id="example" class="display">
+                <thead>
+                    <tr>
+                        <th style="position: relative">
+                            Email
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Users)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-page="/Users/Edit" asp-route-userId="@item.Id">@Html.DisplayFor(model => item.Email)</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
-
-
+    </div>
+    <button class="collapsible">Add Tag</button>
+    <div class="content">
+        a
     </div>
 }
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.3.1/dt-1.10.18/fh-3.1.4/datatables.min.css" />
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jq-3.3.1/dt-1.10.18/fh-3.1.4/datatables.min.js"></script>
+<script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
 
+<script>
+    var jquery = jQuery.noConflict();
+    jquery(document).ready(function () {
+        jquery('#example').DataTable();
+    });
+</script>
 <script>
     var coll = document.getElementsByClassName("collapsible");
     var i;

@@ -60,6 +60,7 @@ namespace Wiki.Core.Domain
         public string TextComment { get; set; }
         public DateTime CreatedAt { get; set; }
         public User Supervisor { get; set; }
+        public byte[] Avatar { get; set; }
 
         public IEnumerable<Suggestion> Suggestions
         {
