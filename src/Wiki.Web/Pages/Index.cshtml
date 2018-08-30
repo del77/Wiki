@@ -5,7 +5,24 @@
     ViewData["Title"] = "Home page";
 }
 
+<style>
+    .iconDetails {
+        margin-left: 2%;
+        float: left;
+        height: 120px;
+        width: 120px;
+    }
 
+    .container2 {
+ 
+        height: auto;
+        padding: 1%;
+    }
+
+    h1 {
+        margin-left: 0px;
+    }
+</style>
 
 <!-- The Modal -->
 <div class="modal fade" id="suggestionModal">
@@ -26,7 +43,7 @@
                         <input type="checkbox" asp-for="@Model.Suggestion.IsAnonymous" />
                         <label>Add as anonymous user</label><br />
                     }
-                    <textarea asp-for="@Model.Suggestion.Content"></textarea>
+                    <textarea asp-for="@Model.Suggestion.Content" style="width: 100%; height:200px; resize: none"></textarea>
                 </div>
 
                 <!-- Modal footer -->
@@ -39,6 +56,57 @@
         </div>
     </div>
 </div>
+<div class="col-md-6 col-lg-offset-3" style="margin-top:20px">
+    <label>Help us improve our site and</label>
+    <a data-toggle="modal" data-target="#suggestionModal" class="btn btn-default">Add suggestion</a>
+    <br/>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <label>Browse articles you added</label>
+        <a asp-page="Articles" class="btn btn-default" asp-route-mine="1">My articles</a>
+            <br/>
+        if (User.IsInRole("Accept"))
+        {
+            <label>Click here to see articles you are managing</label>
+            <a asp-page="Articles" class="btn btn-default" asp-route-mine="2">Manage</a>
 
-<a data-toggle="modal" data-target="#suggestionModal" class="btn btn-default">Add suggestion</a>
-<a asp-page="Articles" asp-route-mine="1">My articles</a>
+        }
+    }
+
+</div>
+<br /><br /><br /><br />
+
+<div class="row">
+    <div class="col-md-6 container2 table-bordered" style="cursor: pointer;" onclick="location.href='/Articles/get?textid=@Model.Articles[0].TextId';">
+        <div>
+            <img src='@Model.Articles[0].Avatar' alt="https://www.unesale.com/ProductImages/Large/notfound.png" class='iconDetails'>
+        </div>
+        <div style='margin-left:60px; margin-top: 60px'>
+            <h3>@Model.Articles[0].Title</h3>
+        </div>
+    </div>
+    <div class="col-md-6 container2 table-bordered" style="cursor: pointer;" onclick="location.href='/Articles/get?textid=@Model.Articles[1].TextId';">
+        <div>
+            <img src='@Model.Articles[1].Avatar' alt="https://www.unesale.com/ProductImages/Large/notfound.png" class='iconDetails'>
+        </div>
+        <div style='margin-left:60px; margin-top: 60px'>
+            <h3>@Model.Articles[1].Title</h3>
+        </div>
+    </div>
+    <div class="col-md-6 container2 table-bordered" style="cursor: pointer; float:right" onclick="location.href='/Articles/get?textid=@Model.Articles[2].TextId';">
+        <div>
+            <img src='@Model.Articles[2].Avatar' alt="https://www.unesale.com/ProductImages/Large/notfound.png" class='iconDetails'>
+        </div>
+        <div style='margin-left:60px; margin-top: 60px'>
+            <h3>@Model.Articles[2].Title</h3>
+        </div>
+    </div>
+    <div class="col-md-6 container2 table-bordered" style="cursor: pointer; float:right" onclick="location.href='/Articles/get?textid=@Model.Articles[3].TextId';">
+        <div>
+            <img src='@Model.Articles[3].Avatar' alt="https://www.unesale.com/ProductImages/Large/notfound.png" class='iconDetails'>
+        </div>
+        <div style='margin-left:60px; margin-top: 60px'>
+            <h3>@Model.Articles[3].Title</h3>
+        </div>
+    </div>
+</div>

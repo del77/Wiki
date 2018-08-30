@@ -15,6 +15,11 @@ namespace Wiki.Core.Domain
             Category = category;
         }
 
+        public ArticleCategory(string category)
+        {
+            Category = category;
+        }
+
         public ArticleCategory(int id)
         {
             Id = id;

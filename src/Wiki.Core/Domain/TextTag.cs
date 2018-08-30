@@ -14,6 +14,11 @@ namespace Wiki.Core.Domain
             Tag = tag;
         }
 
+        public TextTag(string tag)
+        {
+            Tag = tag;
+        }
+
         public TextTag(int id)
         {
             Id = id;

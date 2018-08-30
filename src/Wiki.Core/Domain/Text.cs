@@ -88,6 +88,7 @@ namespace Wiki.Core.Domain
         {
             Supervisor = supervisor;
         }
+
     }
 
 }

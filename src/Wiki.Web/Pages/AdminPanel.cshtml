@@ -45,7 +45,19 @@
     </div>
     <button class="collapsible">Add Tag</button>
     <div class="content">
-        a
+        <form asp-page="./AdminPanel" method="post">
+            <label>Name: </label>
+            <input type="text" name="tag" />
+            <input type="submit" value="Add" class="btn btn-default" />
+        </form>
+    </div>
+    <button class="collapsible">Add Category</button>
+    <div class="content">
+        <form asp-page="./AdminPanel" method="post">
+            <label>Name: </label>
+            <input type="text" name="category" />
+            <input type="submit" value="Add" class="btn btn-default" />
+        </form>
     </div>
 }
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.3.1/dt-1.10.18/fh-3.1.4/datatables.min.css" />

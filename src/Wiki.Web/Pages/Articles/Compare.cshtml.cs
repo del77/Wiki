@@ -23,20 +23,17 @@ namespace Wiki.Web.Pages.Articles
         public Article Article2 { get; set; }
         //public Article Article1 { get; set; }
         //public Article Article2 { get; set; }
-        public List<Diff> diff { get; set; }
+        public List<Diff> Diff { get; set; }
 
         public async Task OnGet(int articleid, int textid)
         {
             var article1 = await articleService.GetAsync(textid);
             var master = (await articleService.BrowseAsync(1 ,null, article1.Id, null)).SingleOrDefault();
             var article2 = await articleService.GetAsync(master.Master.Id);
-            //Article1 = CreateArticle(article1);
-            //Article2 = CreateArticle(article2);
             
             var diffHelper = new HtmlDiff.HtmlDiff(article2.Master.Content, article1.Master.Content);
             article1.Master.Content = diffHelper.Build();
 
-            //dmp.diff_cleanupSemantic(diff);
             Article1 = CreateArticle(article1);
             Article2 = CreateArticle(article2);
 

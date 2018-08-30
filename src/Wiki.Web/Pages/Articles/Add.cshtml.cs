@@ -28,14 +28,18 @@ namespace Wiki.Web.Pages.Articles
         public Filter Filter { get; set; }
         private readonly int userId;
         private readonly IHostingEnvironment _environment;
+        private readonly ITagService tagService;
+        private readonly ICategoryService categoryService;
 
         public bool Editing { get; set; }
         [BindProperty]
         public IFormFile Upload { get; set; }
 
-        public AddModel(IArticleService articleService, IHttpContextAccessor httpContextAccessor, IHostingEnvironment _environment)
+        public AddModel(IArticleService articleService, IHttpContextAccessor httpContextAccessor, IHostingEnvironment _environment, ITagService tagService, ICategoryService categoryService)
         {
             this._environment = _environment;
+            this.tagService = tagService;
+            this.categoryService = categoryService;
             Article = new Article();
             this.articleService = articleService;
             this.httpContextAccessor = httpContextAccessor;
@@ -116,7 +120,6 @@ namespace Wiki.Web.Pages.Articles
                 if (Article.TextId != 0)
                 {
                     var editedArticle = await articleService.GetAsync(Article.TextId);
-                    //var master = (await articleService.BrowseAsync(1, null, null)).Where(x => x.Id == editedArticle.Id).SingleOrDefault();
                     var master = (await articleService.BrowseAsync(1, null, editedArticle.Id, null)).SingleOrDefault();
                     if (master.Master != null)
                     {
@@ -129,9 +132,8 @@ namespace Wiki.Web.Pages.Articles
                     Article.ArticleId = editedArticle.Id;
                     Article.Category = new CategoryFilter
                     {
-                        //Id = master.Category.Id
                         Id = editedArticle.Category.Id
-                   };
+                    };
 
                     if (submit == 0 && editedArticle.Master.Status.Status == "NotSubmitted")
                         await articleService.UpdateVersion(Article.ArticleId, Article.TextId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version, Article.Comment);
@@ -140,17 +142,10 @@ namespace Wiki.Web.Pages.Articles
                     else if (submit == 1 && editedArticle.Master.Status.Status == "NotSubmitted")
                     {
                         await articleService.UpdateVersion(Article.ArticleId, Article.TextId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, Article.Comment);
-                        //await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version);
                     }
                     else if (submit == 1 && editedArticle.Master.Status.Status != "NotSubmitted")
                         await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, image);
                 }
-                //else
-
-                //if (Article.TextId != 0)
-                //{
-                    
-                //}
                 else
                 {
                     Article.Version = 1.0;
@@ -161,22 +156,21 @@ namespace Wiki.Web.Pages.Articles
                         await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, image);
                     }
                 }
+                //return RedirectToPage("/Index");
             }
             
             await SetupFilter(selectedTags);
+            //return Page();
         }
 
         private async Task SetupFilter(int[] selectedTags)
         {
-            var filter = await articleService.GetFilterInfo();
+
+            var tagss = await tagService.GetAllAsync();
+            var categoriess = await categoryService.GetAllAsync();
             var categories = new List<CategoryFilter>();
-            //categories.Add(new CategoryFilter
-            //{
-            //    Id = 0,
-            //    Category = "All",
-            //    Selected = true
-            //}); todo select cateogry
-            foreach (var category in filter.Categories)
+
+            foreach (var category in categoriess)
             {
                 categories.Add(new CategoryFilter
                 {
@@ -188,13 +182,12 @@ namespace Wiki.Web.Pages.Articles
 
             Filter = new Filter
             {
-                //Title = title,
                 Categories = new SelectList(categories, "Id", "Category"),
             };
             var tags = new List<SelectListItem>();
 
             //Filter.Tags2 = new List<TagFilter>();
-            foreach (var tag in filter.Tags)
+            foreach (var tag in tagss)
             {
                 tags.Add(new SelectListItem
                 {
@@ -204,22 +197,6 @@ namespace Wiki.Web.Pages.Articles
                 });
             }
             Filter.Tags = new SelectList(tags, "Value", "Text");
-            //foreach (var tag in selectedTags)
-            //{
-            //    Filter.Tags2.Single(x => x.Id == tag).Checked = true;
-            //}
-
-            //if (selectedCategory != 0)
-            //{
-            //    Filter.Categories.Where(x => x.Value == selectedCategory.ToString()).Single().Selected = true;
-            //}
-            //foreach (var tag in selectedTags)
-            //{
-            //    Filter.Tags.Where(x => x.Id == tag).Single().Checked = true;
-            //}
-            
-
-
         }
     }
 }

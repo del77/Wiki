@@ -24,10 +24,10 @@
             }
         </div>
         <div class="col-md-9 table-bordered" style="float:left">
-            @Html.LabelFor(model => model.User.Email)
-            @Html.EditorFor(model => model.User.Email)
+            @Html.LabelFor(model => model.User_.Email)
+            @Html.EditorFor(model => model.User_.Email)
         </div>
     </div>
-            <input type="hidden" value="@Model.User.Id" name="userId"/>
+            <input type="hidden" value="@Model.User_.Id" name="userId"/>
             <input type="submit" value="Save" runat="server" class="btn btn-default" />
 </form>

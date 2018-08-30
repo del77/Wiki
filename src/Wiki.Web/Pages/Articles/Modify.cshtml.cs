@@ -29,16 +29,18 @@ namespace Wiki.Web.Pages.Articles
         }
         public async Task OnGetAsync(int textid, int status)
         {
-            if ( (status == 2 || status == 3) && user.IsInRole("Accept"))
+            if ( (status == 22 || status == 3) && user.IsInRole("Accept"))
                 await articleService.ChangeStatus(textid, status);
             else if(status == 1 && user.IsInRole("Publish"))
             {
                 var article = await articleService.GetAsync(textid);
                 var masterForArticle = (await articleService.BrowseAsync(1, null, article.Id, null)).SingleOrDefault();
-                var tasks = new List<Task>();
-                
-                tasks.Add(Task.Factory.StartNew(() => articleService.ChangeStatus(textid, status)));
-                tasks.Add(Task.Factory.StartNew(() => articleService.ChangeStatus(masterForArticle.Master.Id, 22))); // change actual master status to accepted
+                var tasks = new List<Task>
+                {
+                    Task.Factory.StartNew(() => articleService.ChangeStatus(textid, status)),
+                };
+                if (masterForArticle.Master != null)
+                    tasks.Add(Task.Factory.StartNew(() => articleService.ChangeStatus(masterForArticle.Master.Id, 21))); // change actual master status to archieved
                 Task.WaitAll(tasks.ToArray());
             }
             else if(status==61 && user.IsInRole("Accept"))

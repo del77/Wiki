@@ -63,8 +63,6 @@ namespace Wiki.Infrastructure.Repositories
                 var textId = paramList.Get<int>("Id");
                 //// text
 
-                
-
                 //// textstags
                 foreach (var tag in article.Master.Tags)
                 {
@@ -97,9 +95,6 @@ namespace Wiki.Infrastructure.Repositories
                         textsQuery += $" and authorid={selectedUser}";
                     if(selectedSupervisor!=null)
                         textsQuery += $" and supervisorid={selectedSupervisor}";
-
-
-                    //var textsQuery = "Select t.Id, Title from Texts t, Statuses s where t.statusid = s.id and ArticleID = :artid and t.Title like :tit";
 
                     var texts = connection.Query<Text>(textsQuery, new { artid = article.Id });
 
@@ -152,41 +147,8 @@ namespace Wiki.Infrastructure.Repositories
             text.SetSupervisor(supervisor);
             article.SetCategory(category);
             article.SetMaster(text);
-            //OracleDataReader reader = cmd.ExecuteReader();
-            //Console.WriteLine(reader.GetString(0));
-
-            return article;
-            //Console.ReadLine();
+            return article;;
             }
-        }
-
-        public async Task<IEnumerable<ArticleCategory>> GetCategories()
-        {
-            using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
-            {
-                return await connection.QueryAsync<ArticleCategory>("SELECT * from Categories");   
-            }
-        }
-
-        public async Task<IEnumerable<TextStatus>> GetStatuses()
-        {
-            using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
-            {
-                return await connection.QueryAsync<TextStatus>("SELECT * from Statuses");
-            }
-        }
-
-        public async Task<IEnumerable<TextTag>> GetTags()
-        {
-            using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
-            {
-                return await connection.QueryAsync<TextTag>("SELECT * from Tags");
-            }
-        }
-
-        public async Task RemoveAsync(int id)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task UpdateAsync(Article article)
@@ -211,8 +173,6 @@ namespace Wiki.Infrastructure.Repositories
                 else
                     paramList.Add("SupervisorID", article.Master.Supervisor.Id, direction: ParameterDirection.Input);
                 paramList.Add("CreatedAt", article.Master.CreatedAt, direction: ParameterDirection.Input);
-                //connection.Execute("Insert into Texts (articleid, authorid, statusid, content, title, version, createdat) Values (:ArticleID, :AuthorID, :StatusID, :Content, :Title, :Version, :CreatedAt) returning Id into :Id", paramList);
-
                 
                 string query = $"Update texts set articleid=:ArticleID, authorid=:AuthorID, statusid=:StatusID, content=:Content, title=:Title, version=:Version, textcomment=:TextComment, createdat=:CreatedAt, supervisorid=:SupervisorId where id=:Id";
                 Task task = connection.ExecuteAsync(query, paramList);
@@ -223,19 +183,6 @@ namespace Wiki.Infrastructure.Repositories
                 query = $"Update articles set categoryid=:CategoryId where id=:Id";
                 await connection.ExecuteAsync(query, paramList);
                 await task;
-            }
-        }
-
-        public async Task UpdateAsync(int textid, int status, string comment="")
-        {
-            using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
-            {
-                string query;
-                if(comment == "")
-                    query = $"Update texts set statusid={status} where id={textid}";
-                else
-                    query = $"Update texts set statusid={status}, textcomment='{comment}' where id={textid}";
-                await connection.QueryAsync(query);
             }
         }
     }

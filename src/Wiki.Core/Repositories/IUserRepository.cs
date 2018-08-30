@@ -10,9 +10,7 @@ namespace Wiki.Core.Repositories
         Task<User> GetAsync(int id);
         Task<User> GetAsync(string email);
         Task<IEnumerable<User>> GetAllAsync();
-        Task<IEnumerable<UserPermission>> GetPermissions();
         Task AddAsync(User user);
         Task UpdateAsync(User user);
-        Task RemoveAsync(int id);
     }
 }

@@ -16,42 +16,58 @@ using Wiki.Web.ViewModels;
 namespace Wiki.Web.Pages
 {
     public class IndexModel : PageModel
-    {
-
-        //ICommandDispatcher commandDispatcher; dodac do konstruktora
-        IUserService userService;
+    { 
+        readonly IUserService userService;
         IArticleService articleService;
         private readonly ISuggestionService suggestionService;
 
-        public readonly ClaimsPrincipal User;
+        public readonly ClaimsPrincipal User_;
 
         [BindProperty]
         public Suggestion Suggestion { get; set; }
+
+        [BindProperty]
+        public List<Article> Articles { get; set; }
+
         public IndexModel(IUserService userService, IArticleService articleService, ISuggestionService suggestionService, IHttpContextAccessor httpContextAccessor)
         {
             //this.commandDispatcher = commandDispatcher;    
             this.userService = userService;
             this.articleService = articleService;
             this.suggestionService = suggestionService;
-            User = httpContextAccessor.HttpContext.User;
+            User_ = httpContextAccessor.HttpContext.User;
         }
        
 
-        public async Task OnGet()
+        public async Task OnGetAsync()
         {
-            var xd = new HttpContextAccessor().HttpContext.User.Claims.Where(x => x.Type.Contains("role"));
-            
-            System.Console.WriteLine("abc");
-
-            var ff = new HttpContextAccessor().HttpContext.User.Claims.Where(x => x.Type.Contains("role")).Where(y => y.Value == "Read").SingleOrDefault();
-            //var articledto = await articleService.GetAsync(1);
-            //var userdto = await userService.GetAsync("user1@email.com");
-            //User = userdto.Email;
+            var articles = (await articleService.BrowseAsync(1, null, null, null)).Where(x => x.Master != null);
+            var rnd = new Random();
+            var randomNumbers = Enumerable.Range(0, articles.Count()).OrderBy(x => rnd.Next()).Take(4).ToList();
+            Articles = new List<Article>();
+            foreach(var listid in randomNumbers)
+            {
+                var article = await articleService.GetAsync(articles.ElementAt(listid).Master.Id);
+                var itemlist = new Article
+                {
+                    TextId = article.Master.Id,
+                    Title = article.Master.Title
+                };
+                if (article.Master.Avatar.Length != 0)
+                {
+                    itemlist.Avatar = String.Format("data:image/gif;base64,{0}", Convert.ToBase64String(article.Master.Avatar));
+                }
+                else
+                {
+                    itemlist.Avatar = String.Format("https://www.unesale.com/ProductImages/Large/notfound.png");
+                }
+                Articles.Add(itemlist);
+            }
         }
 
         public async Task OnPostAsync()
         {
-            int? user = Suggestion.IsAnonymous ? (int?)null : Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
+            int? user = Suggestion.IsAnonymous ? (int?)null : Convert.ToInt32(User_.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
             await suggestionService.AddAsync(user, null, Suggestion.Content);
         }
     }

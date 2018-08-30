@@ -14,5 +14,6 @@ namespace Wiki.Infrastructure.Services
         Task LoginAsync(string email, string password);
         Task RegisterAsync(string email, string password);
         Task UpdatePermissions(int userId, IEnumerable<int> permissions);
+        Task Update(int userId, string email);
     }
 }

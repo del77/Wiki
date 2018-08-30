@@ -18,7 +18,7 @@ namespace Wiki.Web.Pages.Articles
         private readonly IArticleService articleService;
         private readonly ISuggestionService suggestionService;
         private readonly IHttpContextAccessor httpContextAccessor;
-        public readonly ClaimsPrincipal User;
+        public readonly ClaimsPrincipal User_;
         public readonly int UserId;
         [BindProperty]
         public ViewModels.Article Article { get; set; }
@@ -36,7 +36,7 @@ namespace Wiki.Web.Pages.Articles
             this.articleService = articleService;
             this.suggestionService = suggestionService;
             this.httpContextAccessor = httpContextAccessor;
-            User = httpContextAccessor.HttpContext.User;
+            User_ = httpContextAccessor.HttpContext.User;
             var claims = (httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"));
             if (claims != null)
                 UserId = Convert.ToInt32(claims.Value);
@@ -68,12 +68,14 @@ namespace Wiki.Web.Pages.Articles
             {
                 foreach (var text in item.Texts)
                 {
-                    var art = new Article();
-                    art.Title = text.Title;
-                    art.Category = new CategoryFilter
+                    var art = new Article
                     {
-                        Id = item.Category.Id,
-                        Category = item.Category.Category
+                        Title = text.Title,
+                        Category = new CategoryFilter
+                        {
+                            Id = item.Category.Id,
+                            Category = item.Category.Category
+                        }
                     };
                     var tags = new List<TagFilter>();
                     foreach (var tag in text.Tags)
@@ -106,7 +108,7 @@ namespace Wiki.Web.Pages.Articles
 
         public async Task OnPostAsync()
         {
-            int? user = Suggestion.IsAnonymous ? (int?)null : Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
+            int? user = Suggestion.IsAnonymous ? (int?)null : Convert.ToInt32(User_.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
             await suggestionService.AddAsync(user, Article.TextId, Suggestion.Content);
             await OnGetAsync(Article.ArticleId, Article.TextId);
         }
@@ -122,7 +124,6 @@ namespace Wiki.Web.Pages.Articles
                 Version = newArt.Master.Version,
                 Comment = newArt.Master.TextComment,
                 CreatedAt = newArt.Master.CreatedAt,
-                Avatar = String.Format("data:image/gif;base64,{0}", Convert.ToBase64String(newArt.Master.Avatar)),
                 Category = new ViewModels.CategoryFilter
                 {
                     Id = newArt.Category.Id,
@@ -141,6 +142,10 @@ namespace Wiki.Web.Pages.Articles
                     Email = newArt.Master.Author.Email
                 }
             };
+            if(newArt.Master.Avatar.Length != 0)
+            {
+                article.Avatar = String.Format("data:image/gif;base64,{0}", Convert.ToBase64String(newArt.Master.Avatar));
+            }
             if (newArt.Master.Supervisor != null)
                 article.Supervisor = new User
                 {

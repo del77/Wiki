@@ -49,7 +49,7 @@ namespace Wiki.Web.Pages.Suggestions
         {
             await suggestionService.MakeServed((int)id);
 
-            return Page();
+            return RedirectToPage("/Suggestions/Index");
         }
     }
 }

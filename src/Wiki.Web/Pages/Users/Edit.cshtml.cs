@@ -19,7 +19,7 @@ namespace Wiki.Web.Pages.Users
         }
 
         [BindProperty]
-        public User User { get; set; }
+        public User User_ { get; set; }
         [BindProperty]
         public List<Permission> Permissions { get; set; }
 
@@ -39,7 +39,7 @@ namespace Wiki.Web.Pages.Users
 
             var user = await userService.GetAsync(userId);
             //var userPermissions = await userService.GetPermissions(id);
-            User = new User
+            User_ = new User
             {
                 Id = user.Id,
                 Email = user.Email,
@@ -52,9 +52,11 @@ namespace Wiki.Web.Pages.Users
             
         }
 
-        public async Task OnPostAsync(int[] selectedPermissions, int userId)
+        public async Task<IActionResult> OnPostAsync(int[] selectedPermissions, int userId)
         {
             await userService.UpdatePermissions(userId, selectedPermissions);
+            await userService.Update(userId, User_.Email);
+            return RedirectToPage("/AdminPanel");
         }
     }
 }

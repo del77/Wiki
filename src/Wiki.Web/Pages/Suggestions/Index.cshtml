@@ -3,8 +3,8 @@
 @{
     ViewData["Title"] = "AdminPanel";
 }
-
-<table class="table">
+<br/><br/><br/>
+<table id="example" class="display">
     <thead>
         <tr>
             <th>
@@ -16,7 +16,7 @@
             <th>
                 Suggestion
             </th>
-            @if(Model.User.IsInRole("Publish"))
+            @if (Model.User.IsInRole("Publish"))
             {
                 <th>
 
@@ -29,25 +29,33 @@
     <tbody>
         @foreach (var item in Model.Suggestions)
         {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Author.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Article.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-            @if (Model.User.IsInRole("Publish") && item.Status == 0)
-            {
-                <a asp-page="./ChangeStatus" asp-route-id="@item.Id">Serve</a>
-            }
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Author.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Article.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Content)
+                </td>
+                <td>
+                    @if (Model.User.IsInRole("Publish") && item.Status == 0)
+                    {
+                        <a asp-page="./ChangeStatus" asp-route-id="@item.Id">Serve</a>
+                    }
+                </td>
+            </tr>
         }
     </tbody>
-
-
 </table>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.3.1/dt-1.10.18/fh-3.1.4/datatables.min.css" />
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jq-3.3.1/dt-1.10.18/fh-3.1.4/datatables.min.js"></script>
+<script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+
+<script>
+    var jquery = jQuery.noConflict();
+    jquery(document).ready(function () {
+        jquery('#example').DataTable();
+    });
+</script>

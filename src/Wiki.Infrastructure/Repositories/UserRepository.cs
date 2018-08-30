@@ -24,8 +24,7 @@ namespace Wiki.Infrastructure.Repositories
             using (IDbConnection con = new OracleConnection(settings.ConnectionString))
             {
                 string sql = "INSERT INTO Users (email, password, salt) Values (:email, :password, :salt)";
-                var affectedRows = con.Execute(sql, new { email = user.Email, password = user.Password, salt = user.Salt });
-                //con.Query<User>("SELECT * FROM Users where Email = :email", new { Email = "user1@email.com" });
+                await con.ExecuteAsync(sql, new { email = user.Email, password = user.Password, salt = user.Salt });
             }
         }
         public async Task<IEnumerable<User>> GetAllAsync()
@@ -52,37 +51,13 @@ namespace Wiki.Infrastructure.Repositories
 
         public async Task<User> GetAsync(string email)
         {
-            try
+            using(IDbConnection con = new OracleConnection(settings.ConnectionString))
             {
-                // Please replace the connection string attribute settings
-                
-        
-                using(IDbConnection con = new OracleConnection(settings.ConnectionString))
-                {
-                    var user = (await con.QueryAsync<User>("SELECT * FROM Users where Email = :Email", new { Email = email })).Single();
-                    //var permissions = await con.QueryAsync<int>("Select permissionid from userpermissions where userid = :Userid", new { Userid = id });
-                    var permissions = await con.QueryAsync<UserPermission>("Select p.id, permission from permissions p, userpermissions up where p.id = permissionid and userid = :Userid", new { Userid = user.Id });
-                    //var userPermissions = new HashSet<UserPermission>();
-                    //foreach(var permission in permissions)
-                    //{
-                    //    userPermissions.Add(new UserPermission(permission));
-                    //}
-                    user.SetPermissions(new HashSet<UserPermission>(permissions));
-                    return user;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error : {0}", ex);
-            }
-            return null;
-        }
+                var user = (await con.QueryAsync<User>("SELECT * FROM Users where Email = :Email", new { Email = email })).Single();
+                var permissions = await con.QueryAsync<UserPermission>("Select p.id, permission from permissions p, userpermissions up where p.id = permissionid and userid = :Userid", new { Userid = user.Id });
 
-        public async Task<IEnumerable<UserPermission>> GetPermissions()
-        {
-            using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
-            {
-                return await connection.QueryAsync<UserPermission>("SELECT * from Permissions");
+                user.SetPermissions(new HashSet<UserPermission>(permissions));
+                return user;
             }
         }
 
@@ -91,9 +66,13 @@ namespace Wiki.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task UpdateAsync(User user)
+        public async Task UpdateAsync(User user)
         {
-            throw new NotImplementedException();
+            using (IDbConnection con = new OracleConnection(settings.ConnectionString))
+            {
+                string sql = "update Users set email=:email, password=:password, salt=:salt where id=:id";
+                await con.ExecuteAsync(sql, new { email = user.Email, password = user.Password, salt = user.Salt, id = user.Id });
+            }
         }
     }
 }

@@ -8,27 +8,23 @@ using Wiki.Infrastructure.DTO;
 
 namespace Wiki.Infrastructure.Services
 {
-    public class PermissionService// : IPermissionService
+    public class PermissionService : IPermissionService
     {
-        //private readonly IPermissionRepository permissionRepository;
-        //private readonly IMapper mapper;
+        private readonly IPermissionRepository permissionRepository;
+        private readonly IMapper mapper;
 
-        //public PermissionService(IPermissionRepository permissionRepository, IMapper mapper)
-        //{
-        //    this.permissionRepository = permissionRepository;
-        //    this.mapper = mapper;
-        //}
+        public PermissionService(IPermissionRepository permissionRepository, IMapper mapper)
+        {
+            this.permissionRepository = permissionRepository;
+            this.mapper = mapper;
+        }
 
-        //public async Task<IEnumerable<UserPermissionDto>> BrowseAsync()
-        //{
-        //    var permissions = await permissionRepository.GetAllAsync(null);
-        //    return mapper.Map<IEnumerable<UserPermissionDto>>(permissions);
-        //}
+        public async Task<IEnumerable<UserPermissionDto>> BrowseAsync()
+        {
+            var permissions = await permissionRepository.GetAllAsync();
+            return mapper.Map<IEnumerable<UserPermissionDto>>(permissions);
+        }
 
-        //public async Task<IEnumerable<UserPermissionDto>> GetUserPermissions(int userId)
-        //{
-        //    var permissions = await permissionRepository.GetAllAsync(userId);
-        //    return mapper.Map<IEnumerable<UserPermissionDto>>(permissions);
-        //}
+        
     }
 }

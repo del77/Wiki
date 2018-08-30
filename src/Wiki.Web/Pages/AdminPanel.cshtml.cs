@@ -12,10 +12,14 @@ namespace Wiki.Web.Pages
     public class AdminPanelModel : PageModel
     {
         private readonly IUserService userService;
+        private readonly ITagService tagService;
+        private readonly ICategoryService categoryService;
 
-        public AdminPanelModel(IUserService userService)
+        public AdminPanelModel(IUserService userService, ITagService tagService, ICategoryService categoryService)
         {
             this.userService = userService;
+            this.tagService = tagService;
+            this.categoryService = categoryService;
         }
 
         [BindProperty]
@@ -35,6 +39,14 @@ namespace Wiki.Web.Pages
                     Email = user.Email
                 });
             }
+        }
+
+        public async Task OnPostAsync(string tag, string category)
+        {
+            if (tag != null)
+                await tagService.CreateAsync(tag);
+            else
+                await categoryService.CreateAsync(category);
         }
     }
 }

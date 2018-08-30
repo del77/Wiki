@@ -8,6 +8,7 @@ namespace Wiki.Web.ViewModels
 {
     public class Filter
     {
+
         public SelectList Categories { get; set; }
         public SelectList Tags { get; set; }
 

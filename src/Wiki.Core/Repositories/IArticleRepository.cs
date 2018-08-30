@@ -11,10 +11,5 @@ namespace Wiki.Core.Repositories
         Task<IEnumerable<Article>> GetAllAsync(int? selectedStatus, int? selectedUser, int? selectedArticle, int? selectedSupervisor);
         Task AddAsync(Article article);
         Task UpdateAsync(Article article);
-        Task RemoveAsync(int id);
-        Task<IEnumerable<ArticleCategory>> GetCategories();
-        Task<IEnumerable<TextTag>> GetTags();
-        Task<IEnumerable<TextStatus>> GetStatuses();
-        Task UpdateAsync(int textid, int status, string comment);
     }
 }

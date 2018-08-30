@@ -24,8 +24,6 @@ namespace Wiki.Infrastructure.Services
             this.articleTagsRepository = articleTagsRepository;
         }
 
-
-
         public async Task<IEnumerable<ArticleDto>> BrowseAsync(int? selectedStatus, int? selectedUser, int? selectedArticle, int? selectedSupervisor)
         {
             var articles = await articleRepository.GetAllAsync(selectedStatus, selectedUser, selectedArticle, selectedSupervisor);
@@ -37,18 +35,6 @@ namespace Wiki.Infrastructure.Services
         {
             var article = await articleRepository.GetAsync(textid);
             return mapper.Map<ArticleDetailsDto>(article);
-        }
-
-        public async Task<FilterInfo> GetFilterInfo()
-        {
-            var categories = await articleRepository.GetCategories();
-            var tags = await articleRepository.GetTags();
-            var statuses = await articleRepository.GetStatuses();
-            var filter = new FilterInfo();
-            filter.Categories = mapper.Map<IEnumerable<ArticleCategoryDto>>(categories);
-            filter.Tags = mapper.Map<IEnumerable<TextTagDto>>(tags);
-            filter.Statuses = mapper.Map<IEnumerable<TextStatusDto>>(statuses);
-            return filter;
         }
 
         public async Task AddAsync(int articleId, string title, string content, int status, int[] selectedTags, int selectedCategory, int author, double version, byte[] image)
@@ -82,7 +68,10 @@ namespace Wiki.Infrastructure.Services
 
         public async Task ChangeStatus(int textid, int status, string comment="")
         {
-            await articleRepository.UpdateAsync(textid, status, comment);
+            var article = await articleRepository.GetAsync(textid);
+            article.Master.SetStatus(new TextStatus(status));
+            article.Master.SetComment(comment);
+            await articleRepository.UpdateAsync(article);
         }
 
         public async Task UpdateVersion(int articleId, int textId, string title, string content, int status, int[] selectedTags, int selectedCategory, int author, double version, string textcomment)

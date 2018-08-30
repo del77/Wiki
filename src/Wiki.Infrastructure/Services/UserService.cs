@@ -14,13 +14,15 @@ namespace Wiki.Infrastructure.Services
         private readonly IMapper mapper;
         private readonly IEncrypter encrypter;
         private readonly IUserPermissionRepository userPermissionRepository;
+        private readonly IPermissionRepository permissionRepository;
 
-        public UserService(IUserRepository userRepository, IMapper mapper, IEncrypter encrypter, IUserPermissionRepository userPermissionRepository)
+        public UserService(IUserRepository userRepository, IMapper mapper, IEncrypter encrypter, IUserPermissionRepository userPermissionRepository, IPermissionRepository permissionRepository)
         {
             this.userRepository = userRepository;
             this.mapper = mapper;
             this.encrypter = encrypter;
             this.userPermissionRepository = userPermissionRepository;
+            this.permissionRepository = permissionRepository;
         }
         public async Task<IEnumerable<UserDto>> BrowseAsync()
         {
@@ -42,7 +44,7 @@ namespace Wiki.Infrastructure.Services
 
         public async Task<IEnumerable<UserPermissionDto>> GetPermissionsInfo()
         {
-            var permissions = await userRepository.GetPermissions();
+            var permissions = await permissionRepository.GetAllAsync();
             return mapper.Map<IEnumerable<UserPermissionDto>>(permissions);
         }
 
@@ -70,12 +72,19 @@ namespace Wiki.Infrastructure.Services
             await userRepository.AddAsync(user);
         }
 
+        public async Task Update(int userId, string email)
+        {
+            var user = await userRepository.GetAsync(userId);
+            user.SetEmail(email);
+            await userRepository.UpdateAsync(user);
+        }
+
         public async Task UpdatePermissions(int userId, IEnumerable<int> permissions)
         {
             var user = await userRepository.GetAsync(userId);
             if (user == null)
                 throw new Exception("user doesn't exist");
-            var permissionsInfo = await userRepository.GetPermissions();
+            var permissionsInfo = await permissionRepository.GetAllAsync();
             var tasks = new List<Task>();
             foreach(var permission in permissionsInfo)
             {

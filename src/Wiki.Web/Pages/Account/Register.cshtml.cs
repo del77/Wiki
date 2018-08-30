@@ -37,31 +37,19 @@ namespace Wiki.Web.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // Use Input.Email and Input.Password to authenticate the user
-                // with your custom authentication logic.
-                //
-                // For demonstration purposes, the sample validates the user
-                // on the email address maria.rodriguez@contoso.com with 
-                // any password that passes model validation.
-
                 try
                 {
                     await userService.RegisterAsync(User_.Email, User_.Password);
                 }
                 catch (Exception e)
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid register attempt.");
+                    ModelState.AddModelError(string.Empty, "Invalid register attempt." + e.Message);
                     return Page();
                 }
-                
-
-
-                //_logger.LogInformation($"User {user.Email} logged in at {DateTime.UtcNow}.");
 
                 return LocalRedirect(Url.GetLocalUrl(returnUrl));
             }
 
-            // Something failed. Redisplay the form.
             return Page();
         }
 

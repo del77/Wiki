@@ -38,5 +38,10 @@ namespace Wiki.Core.Domain
         {
             Id = author;
         }
+
+        public void SetEmail(string email)
+        {
+            Email = email;
+        }
     }
 }

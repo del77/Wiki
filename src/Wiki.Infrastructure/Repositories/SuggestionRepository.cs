@@ -24,7 +24,6 @@ namespace Wiki.Infrastructure.Repositories
 
         public async Task AddAsync(Suggestion suggestion)
         {
-            string q1, q2;
             var paramList = new DynamicParameters();
             paramList.Add("Content", suggestion.Content, direction: ParameterDirection.Input);
             paramList.Add("Served", suggestion.Served, direction: ParameterDirection.Input);
@@ -40,9 +39,7 @@ namespace Wiki.Infrastructure.Repositories
 
             using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
             {
-                //var query = $"insert into suggestions (authorid, content, textid) values ({suggestion.Author..NullString()}, '{suggestion.Content}', {suggestion.TextId.NullString()})";
                 await connection.ExecuteAsync("Insert into Suggestions (authorid, content, textid, served) Values (:Authorid, :Content, :Textid, :Served)", paramList);
-                
             }
         }
 
@@ -61,9 +58,6 @@ namespace Wiki.Infrastructure.Repositories
                     suggestion.SetAuthor(user);
                     suggestion.SetText(text);
                 }
-                //var articles = await connection.QueryAsync<Article>(articleQuery, new { cat = "%" + selectedCategory + "%" });
-
-                
                 return suggestions;
 
             }
@@ -83,9 +77,7 @@ namespace Wiki.Infrastructure.Repositories
                 suggestion.SetAuthor(user);
                 suggestion.SetText(text);
                
-
                 return suggestion;
-
             }
         }
 
