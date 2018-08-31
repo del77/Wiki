@@ -54,8 +54,7 @@ namespace Wiki.Web
             services.AddMvc()
                 .AddRazorPagesOptions(options =>
                 {
-                    //options.Conventions.AuthorizePage("/Articles/Add");
-                    
+                    options.Conventions.AuthorizePage("/Articles/Add");
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 

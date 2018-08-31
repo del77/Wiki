@@ -75,7 +75,8 @@
 
 </div>
 <br /><br /><br /><br />
-
+@if (Model.Articles.Count == 4)
+{
 <div class="row">
     <div class="col-md-6 container2 table-bordered" style="cursor: pointer;" onclick="location.href='/Articles/get?textid=@Model.Articles[0].TextId';">
         <div>
@@ -110,3 +111,4 @@
         </div>
     </div>
 </div>
+}

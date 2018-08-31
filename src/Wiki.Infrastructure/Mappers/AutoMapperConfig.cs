@@ -12,7 +12,6 @@ namespace Wiki.Infrastructure.Mappers
             return new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<User, UserDto>();
-                cfg.CreateMap<Agent, AgentDto>();
                 cfg.CreateMap<Article, ArticleDto>();
                 cfg.CreateMap<Article, ArticleDetailsDto>();
                 cfg.CreateMap<Text, TextDto>();

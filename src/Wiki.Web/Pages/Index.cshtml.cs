@@ -65,10 +65,11 @@ namespace Wiki.Web.Pages
             }
         }
 
-        public async Task OnPostAsync()
+        public async Task<IActionResult> OnPostAsync()
         {
             int? user = Suggestion.IsAnonymous ? (int?)null : Convert.ToInt32(User_.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
             await suggestionService.AddAsync(user, null, Suggestion.Content);
+            return RedirectToPage("Index");
         }
     }
 }

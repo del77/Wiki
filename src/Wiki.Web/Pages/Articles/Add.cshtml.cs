@@ -14,6 +14,7 @@ using Wiki.Infrastructure.Services;
 using Wiki.Web.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
+using System.Drawing;
 
 namespace Wiki.Web.Pages.Articles
 {
@@ -30,6 +31,8 @@ namespace Wiki.Web.Pages.Articles
         private readonly IHostingEnvironment _environment;
         private readonly ITagService tagService;
         private readonly ICategoryService categoryService;
+
+        public readonly ImageProperties imageProperties = new ImageProperties();
 
         public bool Editing { get; set; }
         [BindProperty]
@@ -114,6 +117,9 @@ namespace Wiki.Web.Pages.Articles
                     {
                         avatar.CopyTo(memoryStream);
                         image = memoryStream.ToArray();
+                        Image icon = new Bitmap(memoryStream);
+                        if (icon.Width > imageProperties.Width || icon.Height > imageProperties.Height)
+                            throw new Exception("Image dimensions are wrong");
                     }
                 }
                 
@@ -156,9 +162,9 @@ namespace Wiki.Web.Pages.Articles
                         await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, image);
                     }
                 }
-                //return RedirectToPage("/Index");
+                //return RedirectToPage("/Articles");
             }
-            
+
             await SetupFilter(selectedTags);
             //return Page();
         }
@@ -196,7 +202,17 @@ namespace Wiki.Web.Pages.Articles
                     Selected = false
                 });
             }
+            foreach(var tag in selectedTags)
+            {
+                tags.Single(x => x.Value == tag.ToString()).Selected = true;
+            }
             Filter.Tags = new SelectList(tags, "Value", "Text");
         }
     }
+}
+
+public class ImageProperties
+{
+    public int Width = 300;
+    public int Height = 300;
 }

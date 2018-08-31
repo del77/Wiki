@@ -12,7 +12,7 @@ namespace Wiki.Core.Domain
             Id = id;
         }
 
-        public Article()
+        protected Article()
         {
         }
 
@@ -31,8 +31,7 @@ namespace Wiki.Core.Domain
         
         public Text Master { get;  set; }
         
-        //public Category category {get; protected set;}
-        public ArticleCategory Category {get;  set;}
+        public ArticleCategory Category {get; protected set;}
         public IEnumerable<Text> Texts { get { return texts; }
             set { texts = new List<Text>(value); }
         }
@@ -41,13 +40,6 @@ namespace Wiki.Core.Domain
         {
             Master = text;
         }
-        // public IEnumerable<ArticleTag> Tags 
-        // {
-        //     get { return tags; }
-        //     set { tags = new HashSet<ArticleTag>(value); }
-        // }
-
-
     }
 
 }

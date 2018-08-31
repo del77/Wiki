@@ -84,8 +84,8 @@
             $('#example thead tr').clone(false).appendTo('#example thead');
             $('#example thead tr:eq(1) th').each(function (i) {
                 var title = $(this).text();
-                $(this).html('<input type="text" class="' + i + '" placeholder="Search by' + title.toString()
-                    + '" />');
+                title = title.replace(/\s/g, '');
+                $(this).html('<input type="text" class="' + i + '" placeholder="Search by ' + title + '" />');
 
                 $('input', this).on('input DOMSubtreeModified', function () {
                     if (table.column(i).search() !== this.value) {

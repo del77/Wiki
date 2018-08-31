@@ -27,7 +27,7 @@ namespace Wiki.Web.Pages.Articles
             if (claims != null)
                 userId = Convert.ToInt32(claims.Value);
         }
-        public async Task OnGetAsync(int textid, int status)
+        public async Task<IActionResult> OnGetAsync(int textid, int status)
         {
             if ( (status == 22 || status == 3) && user.IsInRole("Accept"))
                 await articleService.ChangeStatus(textid, status);
@@ -49,15 +49,17 @@ namespace Wiki.Web.Pages.Articles
                 await articleService.SetSupervisor(textid, userId);
 
             }
+            return RedirectToPage("/Articles");
         }
 
-        public async Task OnPostAsync(int textid, string reason)
+        public async Task<IActionResult> OnPostAsync(int textid, string reason)
         {
             if (user.IsInRole("Accept"))
             {
                 int rejectedStatus = 3;
                 await articleService.ChangeStatus(textid, rejectedStatus, reason);
             }
+            return RedirectToPage("/Articles");
         }
         
     }

@@ -17,7 +17,6 @@ namespace Wiki.Web.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly IUserService userService;
-        private readonly IAgentService agentService;
 
         public LoginModel(IUserService userService)
         {
@@ -60,6 +59,10 @@ namespace Wiki.Web.Pages.Account
                 foreach (var permission in user.Permissions)
                 {
                     claims.Add(new Claim(ClaimTypes.Role, permission.Permission));
+                }
+                if(user.Permissions.Count() != 0)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, "Read"));
                 }
                 
                 var claimsIdentity = new ClaimsIdentity(

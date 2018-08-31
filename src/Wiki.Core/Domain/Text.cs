@@ -53,14 +53,14 @@ namespace Wiki.Core.Domain
         }
 
         public int Id { get; set; }
-        public int ArticleId { get;  set; }
-        public string Title { get;  set; }
-        public User Author { get;  set; }
-        public double Version { get; set; }
-        public string TextComment { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public User Supervisor { get; set; }
-        public byte[] Avatar { get; set; }
+        public int ArticleId { get; protected set; }
+        public string Title { get; protected set; }
+        public User Author { get; protected set; }
+        public double Version { get; protected set; }
+        public string TextComment { get; protected set; }
+        public DateTime CreatedAt { get; protected set; }
+        public User Supervisor { get; protected set; }
+        public byte[] Avatar { get; protected set; }
 
         public IEnumerable<Suggestion> Suggestions
         {
@@ -87,6 +87,11 @@ namespace Wiki.Core.Domain
         public void SetSupervisor(User supervisor)
         {
             Supervisor = supervisor;
+        }
+
+        public void SetAvatar(byte[] avatar)
+        {
+            Avatar = avatar;
         }
 
     }

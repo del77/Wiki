@@ -11,8 +11,8 @@ namespace Wiki.Core.Domain
 
         public TextStatus(int id, string status)
         {
+            SetStatus(status);
             Id = id;
-            Status = status;
         }
 
         public TextStatus(int id)
@@ -23,6 +23,13 @@ namespace Wiki.Core.Domain
         protected TextStatus()
         {
 
+        }
+
+        private void SetStatus(string status)
+        {
+            if (String.IsNullOrWhiteSpace(status))
+                throw new Exception("status can't be empty");
+            Status = status;
         }
 
     }

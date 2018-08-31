@@ -17,6 +17,8 @@ namespace Wiki.Core.Domain
 
         public ArticleCategory(string category)
         {
+            if (String.IsNullOrWhiteSpace(category))
+                throw new Exception("Category can't be empty");
             Category = category;
         }
 

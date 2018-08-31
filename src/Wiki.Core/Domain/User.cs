@@ -22,7 +22,6 @@ namespace Wiki.Core.Domain
 
         public User(string email, string password, string salt)
         {
-            //Id = id;
             Email = email;
             Password = password;
             Salt = salt;
@@ -41,6 +40,8 @@ namespace Wiki.Core.Domain
 
         public void SetEmail(string email)
         {
+            if (!email.Contains("@"))
+                throw new Exception("Wrong email");
             Email = email;
         }
     }

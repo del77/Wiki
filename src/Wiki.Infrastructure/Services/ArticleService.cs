@@ -56,7 +56,7 @@ namespace Wiki.Infrastructure.Services
             text.SetTags(tags);
             text.SetAuthor(user);
             if(image.Length!=0)
-                text.Avatar = image;
+                text.SetAvatar(image);
             article.SetText(text);
 
             var category = new ArticleCategory(selectedCategory);

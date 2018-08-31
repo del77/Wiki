@@ -57,7 +57,7 @@
                 @if (@Model.Article.Status.Status == "Moderated" && HttpContextAccessor.HttpContext.User.IsInRole("Accept") && Model.UserId == Model.Article.Supervisor.Id)
                 {
                     <a asp-page="/Articles/Modify" asp-route-textid="@Model.Article.TextId" asp-route-status="22">Accept</a><br />
-                    <a data-toggle="modal" data-target="#rejectModal">Reject</a>
+                    <a data-toggle="modal" data-target="#rejectModal">Reject</a><br/>
                 }
             }
             @if (@Model.Article.Status.Status == "Waiting" && HttpContextAccessor.HttpContext.User.IsInRole("Accept"))
@@ -180,7 +180,7 @@
                 <form asp-page="./Modify" method="post">
                     <div class="modal-body">
                         <input type="hidden" name="textid" value="@Model.Article.TextId" />
-                        <textarea name="reason"></textarea>
+                        <textarea name="reason" style="width: 100%; height:200px; resize: none"></textarea>
                     </div>
 
                     <!-- Modal footer -->

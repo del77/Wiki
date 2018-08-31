@@ -86,7 +86,7 @@ namespace Wiki.Infrastructure.Repositories
                 foreach (var article in articles)
                 {
                     var category = await connection.QueryAsync<ArticleCategory>("Select * From Categories where ID = (Select categoryid from articles where id = :artid)", new { artid = article.Id });
-                    article.Category = category.Single();
+                    article.SetCategory(category.Single());
 
                     var textsQuery = $"Select Id, Title, Version from Texts where ArticleID = :artid";
                     if (selectedStatus != null)
@@ -107,9 +107,9 @@ namespace Wiki.Infrastructure.Repositories
                         var user = (await connection.QueryAsync<User>(userQuery)).Single();
                         var supervisorQuery = $"Select id, email from Users where id = (Select supervisorid from texts where id = {text.Id})";
                         var supervisor = (await connection.QueryAsync<User>(supervisorQuery)).SingleOrDefault();
-                        text.Author = user;
-                        text.Tags = tags;
-                        text.Status = status;
+                        text.SetAuthor(user);
+                        text.SetTags(tags);
+                        text.SetStatus(status);
                         text.SetSupervisor(supervisor);
                     }
                     article.Texts = texts;

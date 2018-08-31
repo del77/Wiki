@@ -68,7 +68,7 @@ namespace Wiki.Infrastructure.Services
 
             var salt = encrypter.GetSalt();
             var hash = encrypter.GetHash(password, salt);
-            //user = new User(1, email, hash, salt);
+            user = new User(email, hash, salt);
             await userRepository.AddAsync(user);
         }
 
@@ -89,7 +89,6 @@ namespace Wiki.Infrastructure.Services
             foreach(var permission in permissionsInfo)
             {
                 tasks.Add(userPermissionRepository.RemoveAsync(permission.Id, userId));
-                //await userPermissionRepository.RemoveAsync(permission.Id, userId);
             }
             await Task.WhenAll(tasks);
             tasks.Clear();
@@ -99,7 +98,6 @@ namespace Wiki.Infrastructure.Services
                 tasks.Add(userPermissionRepository.AddAsync(up));
             }
             await Task.WhenAll(tasks);
-            //user.SetPermissions(new HashSet<UserPermission>(permissions));
         }
     }
 }

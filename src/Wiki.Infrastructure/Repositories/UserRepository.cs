@@ -53,17 +53,14 @@ namespace Wiki.Infrastructure.Repositories
         {
             using(IDbConnection con = new OracleConnection(settings.ConnectionString))
             {
-                var user = (await con.QueryAsync<User>("SELECT * FROM Users where Email = :Email", new { Email = email })).Single();
-                var permissions = await con.QueryAsync<UserPermission>("Select p.id, permission from permissions p, userpermissions up where p.id = permissionid and userid = :Userid", new { Userid = user.Id });
-
-                user.SetPermissions(new HashSet<UserPermission>(permissions));
+                var user = (await con.QueryAsync<User>("SELECT * FROM Users where Email = :Email", new { Email = email })).SingleOrDefault();
+                if (user != null)
+                {
+                    var permissions = await con.QueryAsync<UserPermission>("Select p.id, permission from permissions p, userpermissions up where p.id = permissionid and userid = :Userid", new { Userid = user.Id });
+                    user.SetPermissions(new HashSet<UserPermission>(permissions));
+                }
                 return user;
             }
-        }
-
-        public Task RemoveAsync(int id)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task UpdateAsync(User user)
