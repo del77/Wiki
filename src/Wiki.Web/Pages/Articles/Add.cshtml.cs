@@ -108,7 +108,7 @@ namespace Wiki.Web.Pages.Articles
         {
 
 
-            if (ModelState.IsValid)
+            //if (ModelState.IsValid)
             {
                 byte[] image = new byte[] { };
                 if (avatar != null)

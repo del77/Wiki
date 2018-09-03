@@ -33,10 +33,31 @@
         .image-preview-input-title {
             margin-left: 2px;
         }
+
+
+        .btn {
+            width: 100px;
+            height: 30px;
+            border-radius: 2px;
+            background-color: #c80000;
+            color: #fff;
+            border: 0;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .frm > div {
+            margin-bottom: 10px;
+        }
+
+        .error {
+            border: 1px solid #c80000;
+        }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
     <meta name="viewport" content="width=device-width" />
     <title>TinyMCE Example</title>
     <!-- TinyMCE Script Reference -->
@@ -68,8 +89,8 @@
     </script>
 </head>
 <body>
-    <div asp-validation-summary="All"></div>
-    <form asp-page="./Articles/Add" method="post" class="upload-form" enctype="multipart/form-data">
+    @*<div asp-validation-summary="All" class="text-danger"></div>*@
+    <form asp-page="./Articles/Add" method="post" id="test" class="upload-form" enctype="multipart/form-data">
         <div class="form-actions no-color">
             <script>
                 var jquery = jQuery.noConflict();
@@ -78,31 +99,81 @@
                         placeholder: "Select Tags...",
                         allowClear: false
                     });
-                    jquery('.js-example-basic-single').select2({
-                        placeholder: "Select Category...",
-                        allowClear: false
+                    //jquery('.js-example-basic-single').select2({
+                    //    placeholder: "Select Category...",
+                    //    allowClear: false
+                    //});
+
+                });
+            </script>
+            <script>
+                var jquery = jQuery.noConflict();
+                jquery(document).ready(function () {
+
+                    jquery('.s1').select2({
+                        placeholder: 'Select category'
+                    })
+                    jquery('.s2').select2({
+                        placeholder: 'Select tags'
+                    })
+
+                    jquery.validator.setDefaults({
+                        ignore: []
+                    });
+
+                    jquery('#test').validate({
+                        errorElement: 'span',
+                        errorClass: 'error',
+                        rules: {
+                            category: 'required',
+                            selectedTags: 'required',
+                            title: 'required',
+                            content: 'required'
+                        },
+
+                        highlight: function (element, errorClass, validClass) {
+
+                            var elem = jquery(element);
+
+                            if (elem.hasClass('s-select2')) {
+                                var isMulti = (!!elem.attr('multiple')) ? 's' : '';
+                                elem.siblings('.sl').find('.select2-choice' + isMulti + '').addClass(errorClass);
+                            } else {
+                                elem.addClass(errorClass);
+                            }
+
+                        },
+                        unhighlight: function (element, errorClass, validClass) {
+                            var elem = $(element);
+
+                            elem.removeClass(errorClass);
+                        }
+                    });
+
+                    jquery('select').on('change', function () {
+                        jquery(this).valid();
                     });
 
                 });
             </script>
 
-            <b>Title: </b><input asp-for="Article.Title" />
-            @*<span asp-validation-for="@Model.Article.Title" class="text-danger" />*@
-            <textarea asp-for="Article.Content" id="elm1"></textarea>
-
+            <b>Title: </b><input asp-for="Article.Title" name="title" />
+            <span asp-validation-for="Article.Title" class="text-danger" />
+            <textarea asp-for="Article.Content" id="elm1" name="content"></textarea>
+            <span asp-validation-for="Article.Content" class="text-danger" />
             <div class="row">
                 @if (!Model.Editing || Model.Article.Status.Status == "NotSubmitted")
                 {
-                    <select asp-items="@Model.Filter.Categories" asp-for="Article.Category.Id" class="js-example-basic-single" style="width:50%"><option></option></select>
-                    @*<span asp-validation-for="Article.Category.Id" class="text-danger" />*@
+                    <select asp-items="@Model.Filter.Categories" asp-for="Article.Category.Id" id="singleselect" name="category" class="s1" style="width:50%"><option></option></select>
+                    <br/>
                 }
                 @if (Model.Editing)
                 {
                     <input type="hidden" asp-for="Article.TextId" />
                 }
 
-                <select asp-items="@Model.Filter.Tags" name="selectedTags" class="js-example-basic-multiple" multiple="multiple" style="float:right; width:49%"></select>
-                
+                <select asp-items="@Model.Filter.Tags" name="selectedTags" class="s2" id="multipleselect" multiple="multiple" style="float:right; width:49%"></select>
+
             </div>
             <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
             <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
@@ -136,10 +207,13 @@
             </div>
             <input type="submit" value="Save" asp-route-submit="0" class="btn btn-default" />
             <input type="submit" value="Publish" asp-route-submit="1" class="btn btn-default" />
-
+            <button class="btn">Submit</button>
 
         </div>
     </form>
+
+    
+
 
     <script>
         $(document).on('click', '#close-preview', function () {

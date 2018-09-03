@@ -23,8 +23,10 @@ namespace Wiki.Web.ViewModels
 
     public class CategoryFilter
     {
+
         public int Id { get; set; }
         public string Category { get; set; }
+
         public bool Selected { get; set; }
     }
 
