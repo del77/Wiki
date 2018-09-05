@@ -22,6 +22,7 @@ namespace Wiki.Web.Pages
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ICategoryService categoryService;
         private readonly IStatusService statusService;
+        private readonly ITagService tagService;
 
         public List<ViewModels.Article> Articles { get; set; }
 
@@ -32,7 +33,7 @@ namespace Wiki.Web.Pages
         public bool CanRead { get; set; }
         private readonly int userId;
 
-        public ArticlesModel(IArticleService articleService, IUserService userService, IHttpContextAccessor httpContextAccessor, ICategoryService categoryService, IStatusService statusService)
+        public ArticlesModel(IArticleService articleService, IUserService userService, IHttpContextAccessor httpContextAccessor, ICategoryService categoryService, IStatusService statusService, ITagService tagService)
         {
             
             //this.commandDispatcher = commandDispatcher;    
@@ -41,6 +42,7 @@ namespace Wiki.Web.Pages
             this.httpContextAccessor = httpContextAccessor;
             this.categoryService = categoryService;
             this.statusService = statusService;
+            this.tagService = tagService;
             CanRead = httpContextAccessor.HttpContext.User.IsInRole("Read");
             var claims = (httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"));
             if (claims != null)
@@ -65,7 +67,7 @@ namespace Wiki.Web.Pages
             {
                 if(!User.IsInRole("Accept"))
                 {
-                    // no access
+                    return Forbid();
                 }
                 selectedSupervisor = userId;
                 CanRead = true;
@@ -135,10 +137,12 @@ namespace Wiki.Web.Pages
         {
             var statusess = await statusService.GetAllAsync();
             var categoriess = await categoryService.GetAllAsync();
+            var tags = await tagService.GetAllAsync();
             BrowseFilter = new BrowseFilter
             {
                 Categories = JsonConvert.SerializeObject(categoriess.Select(x => x.Category)),
-                Statuses = JsonConvert.SerializeObject(statusess.Select(x => x.Status))
+                Statuses = JsonConvert.SerializeObject(statusess.Select(x => x.Status)),
+                Tags = JsonConvert.SerializeObject(tags.Select(x => x.Tag))
             };
         }
     }

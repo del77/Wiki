@@ -84,12 +84,16 @@
                 { title: 'Example 2', inline: 'span', classes: 'example2' },
                 { title: 'Table styles' },
                 { title: 'Table row 1', selector: 'tr', classes: 'tablerow1' }
-            ]
+            ],
+            link_assume_external_targets: false,
+            relative_urls: false,
+            remove_script_host: false,
+            document_base_url: "https://localhost:5001",
+            link_list: "/ArticlesLinkList"
         });
     </script>
 </head>
 <body>
-    @*<div asp-validation-summary="All" class="text-danger"></div>*@
     <form asp-page="./Articles/Add" method="post" id="test" class="upload-form" enctype="multipart/form-data">
         <div class="form-actions no-color">
             <script>
@@ -99,13 +103,9 @@
                         placeholder: "Select Tags...",
                         allowClear: false
                     });
-                    //jquery('.js-example-basic-single').select2({
-                    //    placeholder: "Select Category...",
-                    //    allowClear: false
-                    //});
-
                 });
             </script>
+
             <script>
                 var jquery = jQuery.noConflict();
                 jquery(document).ready(function () {
@@ -125,11 +125,18 @@
                         errorElement: 'span',
                         errorClass: 'error',
                         rules: {
-                            category: 'required',
+                            "Article.Category.Id": 'required',
                             selectedTags: 'required',
-                            title: 'required',
-                            content: 'required'
+                            "Article.Title": {
+                                required: true,
+                                maxlength: 50,
+                            },
+                            "Article.Content": {
+                                required: true,
+                                maxlength: 100000
+                            }
                         },
+
 
                         highlight: function (element, errorClass, validClass) {
 
@@ -157,21 +164,23 @@
                 });
             </script>
 
-            <b>Title: </b><input asp-for="Article.Title" name="title" />
+
+
+            <b>Title: </b><input asp-for="Article.Title" />
             <span asp-validation-for="Article.Title" class="text-danger" />
-            <textarea asp-for="Article.Content" id="elm1" name="content"></textarea>
+            <textarea asp-for="Article.Content" id="elm1"></textarea>
             <span asp-validation-for="Article.Content" class="text-danger" />
             <div class="row">
                 @if (!Model.Editing || Model.Article.Status.Status == "NotSubmitted")
                 {
-                    <select asp-items="@Model.Filter.Categories" asp-for="Article.Category.Id" id="singleselect" name="category" class="s1" style="width:50%"><option></option></select>
-                    <br/>
+                    <select asp-items="@Model.Filter.Categories" asp-for="Article.Category.Id" id="singleselect" class="s1" style="width:50%"><option></option></select>
+                    <br />
                 }
                 @if (Model.Editing)
                 {
                     <input type="hidden" asp-for="Article.TextId" />
                 }
-
+                <div id="imgContainer"></div>
                 <select asp-items="@Model.Filter.Tags" name="selectedTags" class="s2" id="multipleselect" multiple="multiple" style="float:right; width:49%"></select>
 
             </div>
@@ -186,7 +195,7 @@
                         <div class="input-group image-preview">
                             <input type="text" class="form-control image-preview-filename" disabled="disabled"> <!-- don't give a name === doesn't send on POST/GET -->
 
-                            <span class="input-group-btn">
+                            <span class="input-group-btn" style="position: relative; top: -18px">
                                 <!-- image-preview-clear button -->
                                 <button type="button" class="btn btn-default image-preview-clear" style="display:none;">
                                     <span class="glyphicon glyphicon-remove"></span> Clear
@@ -196,8 +205,7 @@
                                 <div class="btn btn-default image-preview-input">
                                     <span class="glyphicon glyphicon-folder-open"></span>
                                     <span class="image-preview-input-title">Browse</span>
-                                    <input type="file" accept="image/png, image/jpeg, image/gif" class="upload-f" data-max-size="2048" name="avatar" /> <!-- rename it -->
-
+                                    <input type="file" accept="image/png, image/jpeg, image/gif" class="upload-f" data-max-size="2048" name="avatar" />
                                 </div>
                             </span>
                         </div><!-- /input-group image-preview [TO HERE]-->
@@ -207,8 +215,6 @@
             </div>
             <input type="submit" value="Save" asp-route-submit="0" class="btn btn-default" />
             <input type="submit" value="Publish" asp-route-submit="1" class="btn btn-default" />
-            <button class="btn">Submit</button>
-
         </div>
     </form>
 
@@ -281,7 +287,3 @@
 
 </body>
 </html>
-
-
-<!-- /TinyMCE -->
-<!-- This will contain your HtmlContent and use the TinyMCE editor-->

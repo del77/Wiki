@@ -91,6 +91,9 @@
                         <th>
                             Version
                         </th>
+                        <th>
+                            Status
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -98,10 +101,20 @@
                     {
                         <tr>
                             <td>
-                                <a asp-page="/Articles/Get" asp-route-articleid="@item.ArticleId" asp-route-textid="@item.TextId">@Html.DisplayFor(modelItem => item.Title)</a>
+                                @if (item.TextId == Model.Article.TextId)
+                                {
+                                    <b><a asp-page="/Articles/Get" asp-route-articleid="@item.ArticleId" asp-route-textid="@item.TextId">@Html.DisplayFor(modelItem => item.Title)</a></b><label> (Current)</label>
+                                }
+                                else
+                                {
+                                    <a asp-page="/Articles/Get" asp-route-articleid="@item.ArticleId" asp-route-textid="@item.TextId">@Html.DisplayFor(modelItem => item.Title)</a>
+                                }
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Version)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Status.Status)
                             </td>
 
                         </tr>

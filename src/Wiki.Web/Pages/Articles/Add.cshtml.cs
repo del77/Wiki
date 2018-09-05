@@ -27,11 +27,12 @@ namespace Wiki.Web.Pages.Articles
         public ViewModels.Article Article { get; set; }
         [BindProperty]
         public Filter Filter { get; set; }
+        public List<ViewModels.Article> Articles { get; set; }
         private readonly int userId;
         private readonly IHostingEnvironment _environment;
         private readonly ITagService tagService;
         private readonly ICategoryService categoryService;
-
+        public string Test = "{title: 'abc', value: 'abc2'}";
         public readonly ImageProperties imageProperties = new ImageProperties();
 
         public bool Editing { get; set; }
@@ -47,6 +48,19 @@ namespace Wiki.Web.Pages.Articles
             this.articleService = articleService;
             this.httpContextAccessor = httpContextAccessor;
             userId = Convert.ToInt32(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
+            Articles = new List<Article>
+            {
+                new Article
+                {
+                    TextId = 1,
+                    Title = "a"
+                },
+                new Article
+                {
+                    TextId = 2,
+                    Title = "b"
+                }
+            };
         }
 
         public async Task<IActionResult> OnGet(int textid)
@@ -104,69 +118,62 @@ namespace Wiki.Web.Pages.Articles
             return Page();
         }
 
-        public async Task OnPostAsync(int[] selectedTags, int submit, IFormFile avatar, Article Article = null)
+        public async Task<IActionResult> OnPostAsync(int[] selectedTags, int submit, IFormFile avatar, Article Article = null)
         {
-
-
-            //if (ModelState.IsValid)
+            byte[] image = new byte[] { };
+            if (avatar != null)
             {
-                byte[] image = new byte[] { };
-                if (avatar != null)
+                using (var memoryStream = new MemoryStream())
                 {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        avatar.CopyTo(memoryStream);
-                        image = memoryStream.ToArray();
-                        Image icon = new Bitmap(memoryStream);
-                        if (icon.Width > imageProperties.Width || icon.Height > imageProperties.Height)
-                            throw new Exception("Image dimensions are wrong");
-                    }
+                    avatar.CopyTo(memoryStream);
+                    image = memoryStream.ToArray();
+                    Image icon = new Bitmap(memoryStream);
+                    if (icon.Width > imageProperties.Width || icon.Height > imageProperties.Height)
+                        throw new Exception("Image dimensions are wrong");
                 }
+            }
                 
-                if (Article.TextId != 0)
+            if (Article.TextId != 0)
+            {
+                var editedArticle = await articleService.GetAsync(Article.TextId);
+                var master = (await articleService.BrowseAsync(1, null, editedArticle.Id, null)).SingleOrDefault();
+                if (master.Master != null)
                 {
-                    var editedArticle = await articleService.GetAsync(Article.TextId);
-                    var master = (await articleService.BrowseAsync(1, null, editedArticle.Id, null)).SingleOrDefault();
-                    if (master.Master != null)
-                    {
-                        var masterDetails = await articleService.GetAsync(master.Master.Id);
-                        Article.Version = masterDetails.Master.Version + 0.1;
-                    }
-                    else
-                    Article.Version = 1.0;
-                    Article.Comment = editedArticle.Master.TextComment;
-                    Article.ArticleId = editedArticle.Id;
-                    Article.Category = new CategoryFilter
-                    {
-                        Id = editedArticle.Category.Id
-                    };
-
-                    if (submit == 0 && editedArticle.Master.Status.Status == "NotSubmitted")
-                        await articleService.UpdateVersion(Article.ArticleId, Article.TextId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version, Article.Comment);
-                    else if (submit == 0 && editedArticle.Master.Status.Status != "NotSubmitted")
-                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version, image);
-                    else if (submit == 1 && editedArticle.Master.Status.Status == "NotSubmitted")
-                    {
-                        await articleService.UpdateVersion(Article.ArticleId, Article.TextId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, Article.Comment);
-                    }
-                    else if (submit == 1 && editedArticle.Master.Status.Status != "NotSubmitted")
-                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, image);
+                    var masterDetails = await articleService.GetAsync(master.Master.Id);
+                    Article.Version = masterDetails.Master.Version + 0.1;
                 }
                 else
+                Article.Version = 1.0;
+                Article.Comment = editedArticle.Master.TextComment;
+                Article.ArticleId = editedArticle.Id;
+                Article.Category = new CategoryFilter
                 {
-                    Article.Version = 1.0;
-                    if (submit == 0)
-                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version, image);
-                    else if (submit == 1)
-                    {
-                        await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, image);
-                    }
-                }
-                //return RedirectToPage("/Articles");
-            }
+                    Id = editedArticle.Category.Id
+                };
 
-            await SetupFilter(selectedTags);
-            //return Page();
+                if (submit == 0 && editedArticle.Master.Status.Status == "NotSubmitted")
+                    await articleService.UpdateVersion(Article.ArticleId, Article.TextId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version, Article.Comment);
+                else if (submit == 0 && editedArticle.Master.Status.Status != "NotSubmitted")
+                    await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version, image);
+                else if (submit == 1 && editedArticle.Master.Status.Status == "NotSubmitted")
+                {
+                    await articleService.UpdateVersion(Article.ArticleId, Article.TextId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, Article.Comment);
+                }
+                else if (submit == 1 && editedArticle.Master.Status.Status != "NotSubmitted")
+                    await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, image);
+            }
+            else
+            {
+                Article.Version = 1.0;
+                if (submit == 0)
+                    await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 41, selectedTags, Article.Category.Id, userId, Article.Version, image);
+                else if (submit == 1)
+                {
+                    await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, image);
+                }
+            }
+            return RedirectToPage("/Articles");
+
         }
 
         private async Task SetupFilter(int[] selectedTags)

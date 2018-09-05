@@ -42,7 +42,7 @@ namespace Wiki.Web.Pages.Articles
                 UserId = Convert.ToInt32(claims.Value);
         }
 
-        public async Task<IActionResult> OnGetAsync(int articleid, int textid)
+        public async Task<IActionResult> OnGetAsync(int textid)
         {
             var article = await articleService.GetAsync(textid);
             var masterForArticle = (await articleService.BrowseAsync(1, null, article.Id, null)).SingleOrDefault();
@@ -110,7 +110,7 @@ namespace Wiki.Web.Pages.Articles
         {
             int? user = Suggestion.IsAnonymous ? (int?)null : Convert.ToInt32(User_.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
             await suggestionService.AddAsync(user, Article.TextId, Suggestion.Content);
-            await OnGetAsync(Article.ArticleId, Article.TextId);
+            await OnGetAsync(Article.TextId);
         }
 
 

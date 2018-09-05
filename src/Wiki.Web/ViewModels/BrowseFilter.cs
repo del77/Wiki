@@ -11,5 +11,6 @@ namespace Wiki.Web.ViewModels
         public string Categories { get; set; }
         public string Statuses { get; set; }
         public string Users { get; set; }
+        public string Tags { get; set; }
     }
 }
