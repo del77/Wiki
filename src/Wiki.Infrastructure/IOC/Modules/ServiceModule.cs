@@ -27,10 +27,6 @@ namespace Wiki.Infrastructure.IOC.Modules
                    .As<IHttpContextAccessor>()
                    .SingleInstance();
             
-
-            builder.RegisterType<HttpContextAccessor>()
-                   .As<IHttpContextAccessor>()
-                   .SingleInstance();
         }
     }
 }

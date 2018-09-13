@@ -5,7 +5,6 @@ namespace Wiki.Core.Domain
 {
     public class Text
     {
-        // private IList<Suggestion> suggestions = new List<Suggestion>();
         private IList<Suggestion> suggestions = new List<Suggestion>();
         private ISet<TextTag> tags = new HashSet<TextTag>();
 
@@ -76,7 +75,6 @@ namespace Wiki.Core.Domain
 
         public string Content { get;  set; }
 
-        // public Status Status { get; protected set; }
         public TextStatus Status { get;  set; }
 
         public void SetComment(string textcomment)

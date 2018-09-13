@@ -1,7 +1,7 @@
 ﻿@page
 @model Wiki.Web.Pages.Suggestions.IndexModel
 @{
-    ViewData["Title"] = "AdminPanel";
+    ViewData["Title"] = "Suggestions";
 }
 <br/><br/><br/>
 <table id="example" class="display">
@@ -34,7 +34,7 @@
                     @Html.DisplayFor(modelItem => item.Author.Email)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Article.Title)
+                    <a asp-page="/Articles/Get" asp-route-textid="@item.Article.TextId">@Html.DisplayFor(modelItem => item.Article.Title)</a>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Content)

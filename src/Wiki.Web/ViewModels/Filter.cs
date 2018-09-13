@@ -11,7 +11,6 @@ namespace Wiki.Web.ViewModels
     {
         public SelectList Categories { get; set; }
         public SelectList Tags { get; set; }
-
     }
 
     public class TagFilter
@@ -26,7 +25,6 @@ namespace Wiki.Web.ViewModels
 
         public int Id { get; set; }
         public string Category { get; set; }
-
         public bool Selected { get; set; }
     }
 

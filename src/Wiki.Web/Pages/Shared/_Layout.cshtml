@@ -34,7 +34,7 @@
                 <ul class="nav navbar-nav">
                     <li><a asp-page="/Index">Home</a></li>
                     <li><a asp-page="/Articles/Add">Add article</a></li>
-                    <li><a asp-page="/Articles">Browse</a></li>
+                    <li><a asp-page="/Articles/Index">Browse</a></li>
                     @if (HttpContextAccessor.HttpContext.User.IsInRole("Read"))
                     {
                         <li><a asp-page="/Suggestions/Index">Suggestions</a></li>

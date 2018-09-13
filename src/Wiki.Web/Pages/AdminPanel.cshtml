@@ -17,6 +17,52 @@
     }
 </style>
 
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+
+
+<!-- TinyMCE Script Reference -->
+<script type="text/javascript" src="~/js/tinymce/tinymce.min.js"></script>
+
+
+
+<meta name="viewport" content="width=device-width" />
+<title>TinyMCE Example</title>
+<!-- TinyMCE Script Reference -->
+<script type="text/javascript" src="~/js/tinymce/tinymce.min.js"></script>
+<!-- Script to wire up your TinyMCE editor -->
+<script>
+    tinymce.init({
+        selector: "textarea#elm1",
+        theme: "modern",
+        width: 'auto',
+        height: 300,
+        plugins: [
+            "advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker",
+            "searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
+            "save table contextmenu directionality emoticons template paste textcolor"
+        ],
+
+        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons",
+        style_formats: [
+            { title: 'Bold text', inline: 'b' },
+            { title: 'Red text', inline: 'span', styles: { color: '#ff0000' } },
+            { title: 'Red header', block: 'h1', styles: { color: '#ff0000' } },
+            { title: 'Example 1', inline: 'span', classes: 'example1' },
+            { title: 'Example 2', inline: 'span', classes: 'example2' },
+            { title: 'Table styles' },
+            { title: 'Table row 1', selector: 'tr', classes: 'tablerow1' }
+        ],
+        link_assume_external_targets: false,
+        relative_urls: false,
+        remove_script_host: false,
+        document_base_url: "https://localhost:5001",
+        link_list: "/ArticlesLinkList"
+    });
+</script>
+
 @if (Model.User.IsInRole("Read"))
 {
     <button class="collapsible">Manage Users</button>
@@ -59,6 +105,37 @@
             <input type="submit" value="Add" class="btn btn-default" />
         </form>
     </div>
+    <button class="collapsible">Add instruction for agents</button>
+    <div class="content">
+        <form asp-page-handler="AddInstruction" id="instruction" method="post">
+
+            <script>
+                var jquery = jQuery.noConflict();
+                jquery(document).ready(function () {
+
+                    var validator = jquery('#instruction').validate({
+
+                        rules: {
+                            title: {
+                                required: true,
+                                maxlength: 50,
+                            },
+                            content: {
+                                required: true,
+                                maxlength: 100000,
+                            },
+                        },
+                    });
+                });
+            </script>
+
+
+
+            <b>Title: </b><input name="title" />
+            <textarea name="content" id="elm1" style="width: 100%; height:200px; resize: none"></textarea>
+            <input type="submit" value="Add" class="btn btn-default" />
+        </form>
+    </div>
 }
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.3.1/dt-1.10.18/fh-3.1.4/datatables.min.css" />
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/jq-3.3.1/dt-1.10.18/fh-3.1.4/datatables.min.js"></script>
@@ -86,3 +163,6 @@
         });
     }
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>

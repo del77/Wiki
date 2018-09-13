@@ -23,7 +23,8 @@
         margin-left: 0px;
     }
 </style>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
 <!-- The Modal -->
 <div class="modal fade" id="suggestionModal">
     <div class="modal-dialog">
@@ -36,7 +37,26 @@
             </div>
 
             <!-- Modal body -->
-            <form asp-page="./Modify" method="post">
+            <form asp-page="./Modify" id="suggestion" method="post">
+
+                <script>
+                var jquery = jQuery.noConflict();
+                jquery(document).ready(function () {
+
+                    var validator = jquery('#suggestion').validate({
+                        errorElement: 'span',
+                        errorClass: 'error',
+                        wrapper: "ul",
+                        rules: {
+                            "Suggestion.Content": {
+                                required: true,
+                                maxlength: 1000,
+                            },              
+                        },
+                    });                 
+                });
+                </script>
+
                 <div class="modal-body">
                     @if (Model.User.Identity.IsAuthenticated)
                     {
@@ -45,7 +65,7 @@
                     }
                     else
                     {
-                        <input type="hidden" asp-for="@Model.Suggestion.IsAnonymous" value="true"/>
+                        <input type="hidden" asp-for="@Model.Suggestion.IsAnonymous" value="true" />
 
                     }
                     <textarea asp-for="@Model.Suggestion.Content" style="width: 100%; height:200px; resize: none"></textarea>
@@ -68,12 +88,12 @@
     @if (User.Identity.IsAuthenticated)
     {
         <label>Browse articles you added</label>
-        <a asp-page="Articles" class="btn btn-default" asp-route-mine="1">My articles</a>
+        <a asp-page="Articles/Index" class="btn btn-default" asp-route-mine="1">My articles</a>
             <br/>
         if (User.IsInRole("Accept"))
         {
             <label>Click here to see articles you are managing</label>
-            <a asp-page="Articles" class="btn btn-default" asp-route-mine="2">Manage</a>
+            <a asp-page="Articles/Index" class="btn btn-default" asp-route-mine="2">Manage</a>
 
         }
     }

@@ -40,7 +40,6 @@ namespace Wiki.Web.Pages.Users
             }
 
             var user = await userService.GetAsync(userId);
-            //var userPermissions = await userService.GetPermissions(id);
             User_ = new User
             {
                 Id = user.Id,

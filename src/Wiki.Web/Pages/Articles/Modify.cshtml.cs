@@ -49,7 +49,11 @@ namespace Wiki.Web.Pages.Articles
                 await articleService.SetSupervisor(textid, userId);
 
             }
-            return RedirectToPage("/Articles");
+            else if(status==21 && user.IsInRole("Publish"))
+            {
+                await articleService.ChangeStatus(textid, status);
+            }
+            return RedirectToPage("/Articles/Index");
         }
 
         public async Task<IActionResult> OnPostAsync(int textid, string reason)
@@ -59,7 +63,7 @@ namespace Wiki.Web.Pages.Articles
                 int rejectedStatus = 3;
                 await articleService.ChangeStatus(textid, rejectedStatus, reason);
             }
-            return RedirectToPage("/Articles");
+            return RedirectToPage("/Articles/Index");
         }
         
     }

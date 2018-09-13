@@ -36,7 +36,10 @@ namespace Wiki.Web.Pages.Suggestions
             {
                 var art = new Article();
                 if (suggestion.Text != null)
+                {
                     art.Title = suggestion.Text.Title;
+                    art.TextId = suggestion.Text.Id;
+                }
 
                 var author = new Author();
                 if (suggestion.Author != null)

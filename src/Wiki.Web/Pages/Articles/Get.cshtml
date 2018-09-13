@@ -21,7 +21,10 @@
         <h2>@Model.Article.Title</h2>
         <p>Author: @Model.Article.Author.Email</p>
         <p>Tags: @Model.Article.Tags.Select(x => x.Tag).AsString()</p>
+        @if (Model.Article.Category != null)
+        {
         <p>Category: @Model.Article.Category.Category</p>
+        }
         <p>Created At: @Model.Article.CreatedAt</p>
         @if (Model.Article.Comment != null)
         {
@@ -45,8 +48,11 @@
         @Html.Raw("<div class=\"article\">" + Model.Article.Content + "</div>")
     </div>
     <div class="col-md-2 table-bordered" style="float:right">
+        @if (Model.Article.Status.Status != "NotSubmitted")
+        {
         <a data-toggle="modal" data-target="#suggestionModal">Add suggestion</a><br />
-        @if (Model.HttpContext.User.Identity.IsAuthenticated)
+        }
+        @if (Model.HttpContext.User.Identity.IsAuthenticated && Model.Article.Status.Status != "AgentInstruction")
         {
             @if (!(Model.Article.Status.Status == "NotSubmitted" && Model.Article.Author.Id != Model.UserId))
             {
@@ -57,7 +63,7 @@
                 @if (@Model.Article.Status.Status == "Moderated" && HttpContextAccessor.HttpContext.User.IsInRole("Accept") && Model.UserId == Model.Article.Supervisor.Id)
                 {
                     <a asp-page="/Articles/Modify" asp-route-textid="@Model.Article.TextId" asp-route-status="22">Accept</a><br />
-                    <a data-toggle="modal" data-target="#rejectModal">Reject</a><br/>
+                    <a data-toggle="modal" data-target="#rejectModal">Reject</a><br />
                 }
             }
             @if (@Model.Article.Status.Status == "Waiting" && HttpContextAccessor.HttpContext.User.IsInRole("Accept"))
@@ -66,7 +72,6 @@
             }
             @if (HttpContextAccessor.HttpContext.User.IsInRole("Read"))
             {
-                @*<a asp-page="/Articles/Compare" asp-route-textid="@Model.Article.TextId">Compare to master</a><br />*@
                 <a data-toggle="modal" data-target="#comparisionModal">Compare to master</a><br />
 
             }
@@ -74,11 +79,15 @@
             {
                 <a asp-page="/Articles/Modify" asp-route-textid="@Model.Article.TextId" asp-route-status="1">Make Master</a><br />
             }
+            @if (@Model.Article.Status.Status == "Master" && HttpContextAccessor.HttpContext.User.IsInRole("Publish"))
+            {
+                <a asp-page="/Articles/Modify" asp-route-textid="@Model.Article.TextId" asp-route-status="21">Archive</a><br />
+            }
         }
     </div>
 
     <br/><br/>
-    @if (Model.User.IsInRole("Read"))
+    @if (Model.User.IsInRole("Read") && Model.Article.Status.Status != "AgentInstruction")
     {
         <button class="collapsible">Show other versions of this article</button>
         <div class="content">
@@ -155,7 +164,26 @@
                 </div>
 
                 <!-- Modal body -->
-                <form method="post">
+                <form method="post" id="suggestion">
+                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
+                    <script>
+                        var jquery = jQuery.noConflict();
+                        jquery(document).ready(function () {
+
+                            var validator = jquery('#suggestion').validate({
+                                errorElement: 'span',
+                                errorClass: 'error',
+                                wrapper: "ul",
+                                rules: {
+                                    "Suggestion.Content": {
+                                        required: true,
+                                        maxlength: 1000,
+                                    },
+                                },
+                            });
+                        });
+                    </script>
                     <div class="modal-body">
                         @if (Model.User.Identity.IsAuthenticated)
                         {

@@ -96,6 +96,7 @@
 <body>
     <form asp-page="./Articles/Add" method="post" id="test" class="upload-form" enctype="multipart/form-data">
         <div class="form-actions no-color">
+            <div id="errors"></div>
             <script>
                 var jquery = jQuery.noConflict();
                 jquery(document).ready(function () {
@@ -106,6 +107,7 @@
                 });
             </script>
 
+           
             <script>
                 var jquery = jQuery.noConflict();
                 jquery(document).ready(function () {
@@ -118,12 +120,34 @@
                     })
 
                     jquery.validator.setDefaults({
-                        ignore: []
+                        ignore: [],
+                        errorPlacement: function (error, element) {
+                            error.appendTo('#nameError');
+                        }
                     });
 
-                    jquery('#test').validate({
+
+
+                    jquery.validator.addMethod('maxImageSize', function (value, element, minSize) {
+                        var imageSize = jquery(element).data('imageSize');
+                        if (value == "")
+                            return true;
+                        return (imageSize)
+                            && (imageSize.width <= minSize.width)
+                            && (imageSize.height <= minSize.height);
+                    }, function (minSize, element) {
+                        return (jquery(element).data('imageSize'))
+                            ? ("Your image's size must not be greater than "
+                                + minSize.width + "px by " + minSize.height + "px")
+                            : "Selected file is not an image.";
+                    });
+
+                   
+
+                    var validator = jquery('#test').validate({
                         errorElement: 'span',
                         errorClass: 'error',
+                        wrapper: "ul",
                         rules: {
                             "Article.Category.Id": 'required',
                             selectedTags: 'required',
@@ -134,9 +158,27 @@
                             "Article.Content": {
                                 required: true,
                                 maxlength: 100000
+                            },
+                            avatar: {
+                                required: false,
+                                maxImageSize: { width: @Model.imageProperties.Width, height: @Model.imageProperties.Height }
                             }
                         },
 
+                        messages: {
+                            "Article.Category.Id": {
+                                required: "Please choose a category"
+                            },
+                            "Article.Title": {
+                                required: "Please insert a title"
+                            },
+                            selectedTags: {
+                                required: "Please choose at least one tag"
+                            },
+                            "Article.Content": {
+                                required: "Please insert an article content"
+                            }
+                        },
 
                         highlight: function (element, errorClass, validClass) {
 
@@ -161,15 +203,53 @@
                         jquery(this).valid();
                     });
 
+
+
+                    var $submitBtn = jquery('.some_form').find('input:submit'),
+                        $photoInput = jquery('#photoInput'),
+                        $imgContainer = jquery('#imgContainer');
+
+                    jquery('#photoInput').change(function () {
+                        $photoInput.removeData('imageSize');
+                        $imgContainer.hide().empty();
+
+                        var file = this.files[0];
+
+                        if (file.type.match(/image\/.*/)) {
+                            $submitBtn.attr('disabled', true);
+
+                            var reader = new FileReader();
+
+                            reader.onload = function () {
+                                var $img = $('<img style="display: none"/>').attr({ src: reader.result });
+
+                                $img.on('load', function () {
+                                    $imgContainer.append($img).show();
+
+                                    $photoInput.data('imageSize', {
+                                        width: $img.width(),
+                                        height: $img.height()
+                                    });
+
+                                    $submitBtn.attr('disabled', false);
+
+                                    validator.element($photoInput);
+                                });
+                            }
+
+                            reader.readAsDataURL(file);
+                        } else {
+                            validator.element(null);
+                        }
+                    });
                 });
             </script>
 
 
+            <div id="nameError"></div>
 
             <b>Title: </b><input asp-for="Article.Title" />
-            <span asp-validation-for="Article.Title" class="text-danger" />
             <textarea asp-for="Article.Content" id="elm1"></textarea>
-            <span asp-validation-for="Article.Content" class="text-danger" />
             <div class="row">
                 @if (!Model.Editing || Model.Article.Status.Status == "NotSubmitted")
                 {
@@ -187,11 +267,10 @@
             <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
             <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
             <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-            <!------ Include the above in your HEAD tag ---------->
             <div class="container">
                 <div class="row">
                     <div class="col-xs-12 col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-                        <!-- image-preview-filename input [CUT FROM HERE]-->
+
                         <div class="input-group image-preview">
                             <input type="text" class="form-control image-preview-filename" disabled="disabled"> <!-- don't give a name === doesn't send on POST/GET -->
 
@@ -200,16 +279,19 @@
                                 <button type="button" class="btn btn-default image-preview-clear" style="display:none;">
                                     <span class="glyphicon glyphicon-remove"></span> Clear
                                 </button>
-                                <!-- image-preview-input -->
 
-                                <div class="btn btn-default image-preview-input">
+
+                                <span class="btn btn-default image-preview-input">
                                     <span class="glyphicon glyphicon-folder-open"></span>
                                     <span class="image-preview-input-title">Browse</span>
-                                    <input type="file" accept="image/png, image/jpeg, image/gif" class="upload-f" data-max-size="2048" name="avatar" />
-                                </div>
+                                    <input type="file" accept="image/png, image/jpeg, image/gif" class="upload-f" id="photoInput" data-max-size="2048" name="avatar" />
+                                </span>
                             </span>
-                        </div><!-- /input-group image-preview [TO HERE]-->
-                        <p class="small">The maximum dimensions are 300 height and 300 width.</p>
+                            <div id="nameError">
+                            </div>
+                        </div>
+                        <p class="small">The maximum dimensions are @Model.imageProperties.Height height and @Model.imageProperties.Width width.</p>
+
                     </div>
                 </div>
             </div>

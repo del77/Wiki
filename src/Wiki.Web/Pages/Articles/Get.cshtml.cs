@@ -57,7 +57,7 @@ namespace Wiki.Web.Pages.Articles
                 TitleComparision = diffHelper.Build();
             }
             if (!httpContextAccessor.HttpContext.User.IsInRole("Read") && article.Master.Status.Id != 1 && article.Master.Author.Id != UserId)
-                return Page();
+                return Forbid();
 
 
             Article = CreateArticle(article);
@@ -71,11 +71,6 @@ namespace Wiki.Web.Pages.Articles
                     var art = new Article
                     {
                         Title = text.Title,
-                        Category = new CategoryFilter
-                        {
-                            Id = item.Category.Id,
-                            Category = item.Category.Category
-                        }
                     };
                     var tags = new List<TagFilter>();
                     foreach (var tag in text.Tags)
@@ -97,7 +92,14 @@ namespace Wiki.Web.Pages.Articles
                         Status = text.Status.Status,
                         Selected = false
                     };
-
+                    if(item.Category != null)
+                    {
+                        art.Category = new CategoryFilter
+                        {
+                            Id = item.Category.Id,
+                            Category = item.Category.Category
+                        };
+                    }
 
 
                     OtherVersions.Add(art);
@@ -124,11 +126,6 @@ namespace Wiki.Web.Pages.Articles
                 Version = newArt.Master.Version,
                 Comment = newArt.Master.TextComment,
                 CreatedAt = newArt.Master.CreatedAt,
-                Category = new ViewModels.CategoryFilter
-                {
-                    Id = newArt.Category.Id,
-                    Category = newArt.Category.Category
-                },
                 Content = newArt.Master.Content,
                 Status = new ViewModels.StatusFilter
                 {
@@ -142,16 +139,26 @@ namespace Wiki.Web.Pages.Articles
                     Email = newArt.Master.Author.Email
                 }
             };
-            if(newArt.Master.Avatar.Length != 0)
+            if(newArt.Category!=null)
+            {
+                article.Category = new CategoryFilter
+                {
+                    Id = newArt.Category.Id,
+                    Category = newArt.Category.Category
+                };
+            }
+            if (newArt.Master.Avatar.Length != 0)
             {
                 article.Avatar = String.Format("data:image/gif;base64,{0}", Convert.ToBase64String(newArt.Master.Avatar));
             }
             if (newArt.Master.Supervisor != null)
+            {
                 article.Supervisor = new User
                 {
                     Id = newArt.Master.Supervisor.Id,
                     Email = newArt.Master.Supervisor.Email
                 };
+            }
             var tags = new List<TagFilter>();
             foreach (var tag in newArt.Master.Tags)
             {

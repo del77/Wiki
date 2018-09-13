@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Wiki.Infrastructure.Commands;
 using Wiki.Infrastructure.DTO;
 using Wiki.Infrastructure.Services;
 using Wiki.Web.ViewModels;
@@ -31,7 +30,6 @@ namespace Wiki.Web.Pages
 
         public IndexModel(IUserService userService, IArticleService articleService, ISuggestionService suggestionService, IHttpContextAccessor httpContextAccessor)
         {
-            //this.commandDispatcher = commandDispatcher;    
             this.userService = userService;
             this.articleService = articleService;
             this.suggestionService = suggestionService;
@@ -66,7 +64,7 @@ namespace Wiki.Web.Pages
         }
 
         public async Task<IActionResult> OnPostAsync()
-         {
+        {
             int? user = Suggestion.IsAnonymous ? (int?)null : Convert.ToInt32(User_.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
             await suggestionService.AddAsync(user, null, Suggestion.Content);
             return RedirectToPage("Index");

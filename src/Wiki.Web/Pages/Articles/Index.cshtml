@@ -1,6 +1,6 @@
 ﻿@page
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
-@model ArticlesModel
+@model IndexModel
 @using Kendo.Mvc.UI
 @using System.Collections.Generic
 @using X.PagedList.Mvc;
@@ -8,7 +8,7 @@
 @using Extensions;
 @addTagHelper *, Kendo.Mvc
 @{
-    ViewData["Title"] = "About";
+    ViewData["Title"] = "Articles";
 }
 <style>
     th {

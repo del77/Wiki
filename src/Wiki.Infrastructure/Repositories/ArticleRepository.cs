@@ -33,10 +33,13 @@ namespace Wiki.Infrastructure.Repositories
                 int articleId;
                 if (article.Id == 0)
                 {
-                    paramList.Add("CategoryID", article.Category.Id, direction: ParameterDirection.Input);
+                    if(article.Category != null)
+                        paramList.Add("CategoryID", article.Category.Id, direction: ParameterDirection.Input);
+                    else
+                        paramList.Add("CategoryID", null, direction: ParameterDirection.Input);
                     paramList.Add("Id", DbType.Int32, direction: ParameterDirection.Output);
 
-                    connection.Execute("Insert into Articles (CategoryID) Values (:CategoryID) returning Id into :Id", paramList);
+                    await connection.ExecuteAsync("Insert into Articles (CategoryID) Values (:CategoryID) returning Id into :Id", paramList);
                     articleId = paramList.Get<int>("Id");
                 }
                 else
@@ -59,9 +62,10 @@ namespace Wiki.Infrastructure.Repositories
                     paramList.Add("Avatar", null, direction: ParameterDirection.Input);
                 else
                     paramList.Add("Avatar", article.Master.Avatar, direction: ParameterDirection.Input);
-                connection.Execute("Insert into Texts (articleid, authorid, statusid, content, title, version, createdat, avatar) Values (:ArticleID, :AuthorID, :StatusID, :Content, :Title, :Version, :CreatedAt, :Avatar) returning Id into :Id", paramList);
+                await connection.ExecuteAsync("Insert into Texts (articleid, authorid, statusid, content, title, version, createdat, avatar) Values (:ArticleID, :AuthorID, :StatusID, :Content, :Title, :Version, :CreatedAt, :Avatar) returning Id into :Id", paramList);
                 var textId = paramList.Get<int>("Id");
                 //// text
+
 
                 //// textstags
                 foreach (var tag in article.Master.Tags)
@@ -81,12 +85,11 @@ namespace Wiki.Infrastructure.Repositories
             using (IDbConnection connection = new OracleConnection(settings.ConnectionString))
             {
                 var articles = await connection.QueryAsync<Article>(articleQuery);
-                //var articles = await connection.QueryAsync<Article>(articleQuery, new { cat = "%" + selectedCategory + "%" });
 
                 foreach (var article in articles)
                 {
                     var category = await connection.QueryAsync<ArticleCategory>("Select * From Categories where ID = (Select categoryid from articles where id = :artid)", new { artid = article.Id });
-                    article.SetCategory(category.Single());
+                    article.SetCategory(category.SingleOrDefault());
 
                     var textsQuery = $"Select Id, Title, Version from Texts where ArticleID = :artid";
                     if (selectedStatus != null)
@@ -130,7 +133,7 @@ namespace Wiki.Infrastructure.Repositories
             var text = (await connection.QueryAsync<Text>(textsQuery)).Single();
             var article = new Article(text.ArticleId);
             var categoryQuery = $"Select * From Categories where ID = (Select categoryid from articles where id = {article.Id})";
-            var category = (await connection.QueryAsync<ArticleCategory>(categoryQuery)).Single();
+            var category = (await connection.QueryAsync<ArticleCategory>(categoryQuery)).SingleOrDefault();
             var userQuery = $"Select id, email from Users where id = (Select authorid from texts where id = {text.Id})";
             var user = (await connection.QueryAsync<User>(userQuery)).Single();
             var supervisorQuery = $"Select id, email from Users where id = (Select supervisorid from texts where id = {text.Id})";

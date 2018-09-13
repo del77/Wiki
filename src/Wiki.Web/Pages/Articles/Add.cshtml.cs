@@ -34,7 +34,6 @@ namespace Wiki.Web.Pages.Articles
         private readonly ICategoryService categoryService;
         public string Test = "{title: 'abc', value: 'abc2'}";
         public readonly ImageProperties imageProperties = new ImageProperties();
-
         public bool Editing { get; set; }
         [BindProperty]
         public IFormFile Upload { get; set; }
@@ -48,19 +47,6 @@ namespace Wiki.Web.Pages.Articles
             this.articleService = articleService;
             this.httpContextAccessor = httpContextAccessor;
             userId = Convert.ToInt32(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
-            Articles = new List<Article>
-            {
-                new Article
-                {
-                    TextId = 1,
-                    Title = "a"
-                },
-                new Article
-                {
-                    TextId = 2,
-                    Title = "b"
-                }
-            };
         }
 
         public async Task<IActionResult> OnGet(int textid)
@@ -106,7 +92,6 @@ namespace Wiki.Web.Pages.Articles
                     Filter.Tags.Where(x => x.Value == tag.Id.ToString()).Single().Selected = true;
                 }
                 Article.Tags = tags;
-                //Article.Tags.Single(x => x.Id == 2).Checked = true;
                 Article.Content = article.Master.Content;
                 Article.Title = article.Master.Title;
                 Editing = true;
@@ -172,7 +157,7 @@ namespace Wiki.Web.Pages.Articles
                     await articleService.AddAsync(Article.ArticleId, Article.Title, Article.Content, 2, selectedTags, Article.Category.Id, userId, Article.Version, image);
                 }
             }
-            return RedirectToPage("/Articles");
+            return RedirectToPage("/Articles/Index");
 
         }
 
@@ -199,7 +184,6 @@ namespace Wiki.Web.Pages.Articles
             };
             var tags = new List<SelectListItem>();
 
-            //Filter.Tags2 = new List<TagFilter>();
             foreach (var tag in tagss)
             {
                 tags.Add(new SelectListItem

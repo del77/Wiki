@@ -59,9 +59,11 @@ namespace Wiki.Infrastructure.Services
                 text.SetAvatar(image);
             article.SetText(text);
 
-            var category = new ArticleCategory(selectedCategory);
-            article.SetCategory(category);
-            
+            if (selectedCategory != 0)
+            {
+                var category = new ArticleCategory(selectedCategory);
+                article.SetCategory(category);
+            }
 
             await articleRepository.AddAsync(article);
         }

@@ -13,9 +13,9 @@ using Wiki.Infrastructure.Services;
 using Wiki.Web.ViewModels;
 using X.PagedList;
 
-namespace Wiki.Web.Pages
+namespace Wiki.Web.Pages.Articles
 {
-    public class ArticlesModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly IArticleService articleService;
         private readonly IUserService userService;
@@ -33,10 +33,8 @@ namespace Wiki.Web.Pages
         public bool CanRead { get; set; }
         private readonly int userId;
 
-        public ArticlesModel(IArticleService articleService, IUserService userService, IHttpContextAccessor httpContextAccessor, ICategoryService categoryService, IStatusService statusService, ITagService tagService)
+        public IndexModel(IArticleService articleService, IUserService userService, IHttpContextAccessor httpContextAccessor, ICategoryService categoryService, IStatusService statusService, ITagService tagService)
         {
-            
-            //this.commandDispatcher = commandDispatcher;    
             this.articleService = articleService;
             this.userService = userService;
             this.httpContextAccessor = httpContextAccessor;
@@ -85,11 +83,7 @@ namespace Wiki.Web.Pages
                     var article = new Article
                     {
                         Title = text.Title,
-                        Category = new CategoryFilter
-                        {
-                            Id = item.Category.Id,
-                            Category = item.Category.Category
-                        }
+
                     };
                     var tags = new List<TagFilter>();
                     foreach(var tag in text.Tags)
@@ -123,8 +117,17 @@ namespace Wiki.Web.Pages
                             Email = text.Supervisor.Email
                         };
                     }
+                    if(item.Category != null)
+                    {
+                        article.Category = new CategoryFilter
+                        {
+                            Id = item.Category.Id,
+                            Category = item.Category.Category
+                        };
+                    }
                     Articles.Add(article);
                 }
+
             }
 
             BrowseFilter.Titles = JsonConvert.SerializeObject(Articles.Select(x => x.Title));
